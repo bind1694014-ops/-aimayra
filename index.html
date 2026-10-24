@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mayra AI</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" id="tc" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mayra AI">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#fff;--sb:#fafafa;--bd:#ececec;--tx:#141414;--mut:#7a7a7a;--chip:#f4f4f4;--ink:#171717;--inkt:#fff;--card:#fff;--hl:#e8e8e8;--err:#c0392b;--code:#f6f6f7}
+[data-theme=dark]{--bg:#161617;--sb:#1b1b1d;--bd:#2c2c2f;--tx:#ededed;--mut:#9a9a9f;--chip:#242427;--ink:#f2f2f2;--inkt:#111;--card:#1d1d20;--hl:#3a3a3e;--err:#ff7b6b;--code:#222225}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;height:100dvh}
+body{font:14px/1.55 Inter,-apple-system,"Segoe UI",Roboto,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--tx);display:flex;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;outline:0;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--mut)}
+button:focus-visible{outline:2px solid var(--mut);outline-offset:2px}
+svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+/* sidebar */
+#sb{width:250px;background:var(--sb);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:14px 10px;gap:2px;transition:margin .2s;flex:none;z-index:30}
+#sb.hide{margin-left:-250px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:650;font-size:15px;padding:2px 8px 12px}
+.brand .sp{flex:1}
+.nb{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;width:100%;text-align:left;color:var(--tx)}
+.nb:hover,.nb.on{background:var(--chip)}
+.lbl{font-size:12px;color:var(--mut);padding:14px 10px 4px;display:flex;align-items:center;gap:6px}
+#hist{flex:1;overflow:auto;min-height:0}
+.hi{display:flex;align-items:center;border-radius:9px;padding:0 4px 0 10px}
+.hi:hover,.hi.on{background:var(--chip)}
+.hi button.t{flex:1;text-align:left;padding:6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:var(--mut)}
+.hi.on button.t{color:var(--tx)}
+.hi .d{opacity:0;padding:6px;color:var(--mut)}
+.hi:hover .d{opacity:1}
+#qs{display:none;margin:4px 0}
+.user{display:flex;align-items:center;gap:10px;padding:10px;border-top:1px solid var(--bd);margin:6px -10px -14px;padding:12px 18px;width:calc(100% + 20px)}
+.av{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--inkt);display:grid;place-items:center;font-weight:600;font-size:12px;flex:none}
+.user small{display:block;color:var(--mut);font-size:11px}
+/* main */
+main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;height:100%}
+#top{display:flex;align-items:center;padding:10px 14px;gap:8px;min-height:48px}
+#top .sp{flex:1}
+.ib{padding:7px;border-radius:9px;color:var(--mut)}
+.ib:hover{background:var(--chip);color:var(--tx)}
+#scroll{flex:1;overflow:auto;display:flex;flex-direction:column}
+#home{margin:auto;width:100%;max-width:720px;padding:20px;display:flex;flex-direction:column;align-items:center}
+#home h1{font-size:19px;font-weight:600;margin-top:14px}
+#home p.s{color:var(--mut);font-size:13px;margin-bottom:26px}
+#msgs{width:100%;max-width:760px;margin:0 auto;padding:10px 20px 20px;display:none;flex-direction:column;gap:20px}
+.empty #home{display:flex}.empty #msgs{display:none}
+.chatting #home{display:none}.chatting #msgs{display:flex}
+.m{display:flex;gap:12px}
+.m.u{justify-content:flex-end}
+.m.u>div{max-width:85%;display:flex;flex-direction:column;align-items:flex-end}
+.m.u .bd{background:var(--chip);padding:9px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:break-word}
+.m.a .lg{margin-top:3px}
+.m.a .bd{flex:1;min-width:0;overflow-wrap:anywhere}
+.bd p{margin:0 0 10px}.bd p:last-child{margin:0}
+.bd ul,.bd ol{margin:0 0 10px 22px}
+.bd h2,.bd h3,.bd h4{margin:14px 0 6px;font-size:15px}
+.bd a{color:inherit;text-decoration:underline}
+.bd code{background:var(--code);padding:1px 5px;border-radius:5px;font:12.5px ui-monospace,Menlo,Consolas,monospace}
+.code{border:1px solid var(--bd);border-radius:12px;margin:8px 0 12px;overflow:hidden;background:var(--code)}
+.ch{display:flex;justify-content:space-between;padding:6px 12px;font-size:12px;color:var(--mut);border-bottom:1px solid var(--bd)}
+.code pre{padding:12px;overflow:auto}
+.code code{background:none;padding:0;white-space:pre}
+.bd img.g{max-width:min(100%,420px);border-radius:14px;display:block;margin:4px 0;border:1px solid var(--bd)}
+.ims{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;justify-content:flex-end}
+.ims img{height:70px;border-radius:10px}
+.err{color:var(--err)}
+.acts{display:flex;gap:2px;margin-top:6px}
+.dots span{display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:var(--mut);animation:b 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.dots span{animation:none}}
+/* composer */
+#cw{width:100%;max-width:760px;margin:0 auto;padding:0 20px 16px}
+.empty #cw{max-width:720px;padding-bottom:0}
+#comp{border:1px solid var(--bd);border-radius:18px;padding:12px 14px 10px;background:var(--bg);box-shadow:0 2px 14px rgba(0,0,0,.04)}
+#comp:focus-within{border-color:var(--hl)}
+#inp{border:0;padding:0;resize:none;max-height:320px;min-height:24px;border-radius:0;font-size:14px;line-height:1.55}
+#prev{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+#prev div{position:relative}#prev img{height:56px;border-radius:9px;display:block}
+#prev button{position:absolute;top:-6px;right:-6px;background:var(--ink);color:var(--inkt);border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px}
+.cr{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;position:relative}
+.cr .sp{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex:none;border:1px solid var(--bd);border-radius:999px;padding:4px 11px;font-size:12px;background:var(--bg)}
+.chip:hover{background:var(--chip)}
+.chip.on{background:var(--ink);color:var(--inkt);border-color:var(--ink)}
+#mb{min-width:0;font-size:12px;color:var(--mut);display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;max-width:190px}
+#mb:hover{background:var(--chip)}#mb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#send,#vc{flex:none;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--inkt);display:grid;place-items:center}
+#send:disabled{opacity:.35;cursor:default}
+#menu{position:absolute;right:0;bottom:calc(100% + 6px);width:290px;max-height:min(340px,50vh);overflow:auto;background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.12);padding:6px;display:none;z-index:20}
+#menu.open{display:block}
+#menu h6{font-size:11px;color:var(--mut);padding:8px 10px 2px;font-weight:500}
+#menu button{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:8px;font-size:13px}
+#menu button:hover,#menu button.on{background:var(--chip)}
+#extra{width:100%;display:flex;flex-direction:column;gap:22px;margin-top:18px}
+.empty #extra{display:flex}.chatting #extra{display:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.am{display:flex;justify-content:space-between;font-size:12px;font-weight:600}
+.am span+span,.am button{color:var(--mut);font-weight:400}
+.cards{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px;margin-top:8px;scroll-snap-type:x proximity}
+.card{flex:0 0 172px;border:1px solid var(--bd);border-radius:12px;padding:12px;text-align:left;scroll-snap-align:start;background:var(--card)}
+.card:hover{border-color:var(--hl)}
+.card.on{border-color:var(--tx);box-shadow:0 0 0 1px var(--tx)}
+.card b{display:block;font-size:12.5px;margin:2px 0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card small{display:block;color:var(--mut);font-size:11.5px;line-height:1.4;height:32px;overflow:hidden}
+/* gallery / modal */
+#gal{display:none;flex:1;overflow:auto;padding:10px 24px 30px}
+#gal .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px}
+#gal img{width:100%;border-radius:12px;border:1px solid var(--bd);display:block}
+.galv #scroll,.galv #cw{display:none}.galv #gal{display:block}
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50;padding:14px}
+#ov.open{display:flex}
+#mod{background:var(--bg);border:1px solid var(--bd);border-radius:18px;width:100%;max-width:600px;max-height:88vh;overflow:auto;padding:20px}
+#mod h2{font-size:17px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+#mod h3{font-size:12px;color:var(--mut);font-weight:500;margin:20px 0 8px}
+.row{display:flex;gap:10px;align-items:center;margin-bottom:8px}.row>*{flex:1}.row label{flex:0 0 110px;color:var(--mut);font-size:13px}
+details{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+summary{cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:550;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary i{font-style:normal;font-size:11px;color:var(--mut);font-weight:400;margin-left:auto}
+summary i.ok{color:#2e9d57}
+details .in{margin-top:10px;display:grid;gap:8px}
+details a{color:var(--mut);font-size:12px}
+.btn{border:1px solid var(--bd);border-radius:10px;padding:7px 14px}.btn:hover{background:var(--chip)}
+.btn.p{background:var(--ink);color:var(--inkt);border-color:var(--ink)}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.tg button{border:1px solid var(--bd);border-radius:12px;padding:12px;text-align:left}.tg button:hover{background:var(--chip)}
+.tg small{display:block;color:var(--mut)}
+#toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--inkt);padding:10px 18px;border-radius:14px;font-size:13px;line-height:1.5;text-align:center;width:max-content;display:none;z-index:99;max-width:min(92vw,420px);overflow-wrap:anywhere}
+@media(max-width:800px){
+#sb{position:fixed;top:0;bottom:0;left:0;box-shadow:4px 0 24px rgba(0,0,0,.15)}
+.chatting #top,.empty #top{padding:8px}
+#home{padding:12px}.row{flex-direction:column;align-items:stretch}.row label{flex:none}
+.cr .sp{display:none}#mb{margin-left:auto;max-width:200px}.chip{padding:5px 10px}.tt{display:none}#cw{padding:0 12px 12px}.empty #cw{padding:0 12px}
+}
+
+/* live voice (Gemini Live) */
+[hidden]{display:none!important}
+.ir{display:flex;align-items:flex-end;gap:8px}
+.ir #inp{flex:1;min-width:0;padding:5px 0 4px}
+.rg{display:flex;align-items:center;gap:6px;flex:none}
+.vinfo{font-size:12px;color:var(--mut);margin:0 0 8px}
+#vo{--vbg:#dcdcd8;--vfg:#262626;--vmut:#7b7a76;--vc:#d3d2ce;--vbd:#c5c4bf;--vx:#2b2b2b;--vxt:#fff;position:fixed;left:0;right:0;top:0;height:100%;height:100dvh;z-index:60;background:var(--vbg);color:var(--vfg);display:none;flex-direction:column;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));overflow:hidden;--lvl:0}
+[data-theme=dark] #vo{--vbg:#1c1b1a;--vfg:#ece8e4;--vmut:#9a9690;--vc:#2b2927;--vbd:#3b3936;--vx:#ece8e4;--vxt:#1c1b1a}
+#vo.open{display:flex}
+.vtop{display:flex;align-items:center;gap:10px;position:relative;z-index:3}
+.vsp{flex:1}
+.vpill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--vbd);background:var(--vc);color:var(--vmut);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+#vDot{width:8px;height:8px;border-radius:50%;background:#aaa}
+#vo[data-s=listen] #vDot{background:#34c26b}
+#vo[data-s=speak] #vDot{background:#c47a5f}
+#vo[data-s=connect] #vDot{background:#e0a030;animation:vdp 1s infinite}
+@keyframes vdp{50%{opacity:.3}}
+.vc{width:54px;height:54px;border-radius:50%;border:1px solid var(--vbd);background:var(--vc);display:grid;place-items:center;font-size:23px;flex:none;color:var(--vfg);line-height:1}
+.vc svg{width:23px;height:23px}
+.vc.on{background:var(--vx);color:var(--vxt)}
+.vc.off{color:#d4503f}
+.vc.vx{background:var(--vx);color:var(--vxt);width:64px;height:64px;border-color:var(--vx)}
+.vc.vx svg{width:26px;height:26px}
+.vstage{flex:1;min-height:0;display:grid;place-items:center;position:relative}
+.orb{position:relative;width:min(80vw,330px);aspect-ratio:1;background:none;border:0;padding:0;cursor:pointer;display:block}
+.orb .halo{position:absolute;inset:-26%;border-radius:50%;background:radial-gradient(circle,rgba(196,122,95,.17) 0%,rgba(196,122,95,.08) 42%,transparent 70%);transform:scale(calc(1 + var(--lvl)*.4))}
+.orb .ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(196,122,95,.28);transform:scale(calc(1 + var(--lvl)*.12))}
+.orb .ball{position:absolute;inset:8.5%;border-radius:50%;background:linear-gradient(180deg,#c47a5f 0%,#d29a82 42%,#e2d3cc 72%,#e5e0dd 100%);box-shadow:0 24px 50px rgba(196,122,95,.22),inset 0 -18px 40px rgba(255,255,255,.35);transform:scale(calc(1 + var(--lvl)*.1))}
+[data-theme=dark] .orb .ball{background:linear-gradient(180deg,#c47a5f 0%,#a8644d 45%,#6a504a 78%,#463b38 100%);box-shadow:0 24px 50px rgba(196,122,95,.18)}
+#vo[data-s=listen] .orb{animation:vbr 4.2s ease-in-out infinite}
+#vo[data-s=connect] .orb .ball{animation:vcn 1.2s ease-in-out infinite}
+@keyframes vbr{50%{transform:scale(1.025)}}
+@keyframes vcn{50%{opacity:.55}}
+#vTx{min-height:104px;max-height:25vh;overflow:auto;text-align:center;font-size:18px;line-height:1.75;padding:6px 10px 18px;color:var(--vfg);overflow-wrap:anywhere}
+#vTx[data-who=u]{color:var(--vmut)}
+.vbar{display:flex;align-items:center;gap:10px}
+.vin{flex:1;min-width:0;position:relative}
+.vin input{border-radius:999px;height:56px;padding:0 54px 0 22px;background:var(--vc);border:1px solid var(--vbd);color:var(--vfg);font-size:16px}
+.vin input::placeholder{color:var(--vmut)}
+.vin input:focus{border-color:var(--vmut)}
+#vSendT{position:absolute;right:6px;top:6px;width:44px;height:44px;border-radius:50%;background:var(--vx);color:var(--vxt);display:grid;place-items:center}
+#vCam{position:absolute;top:calc(78px + env(safe-area-inset-top,0px));left:16px;width:104px;height:140px;border-radius:16px;overflow:hidden;border:2px solid var(--vbd);background:#000;z-index:3}
+#vCam video{width:100%;height:100%;object-fit:cover}
+#vCam.mir video{transform:scaleX(-1)}
+#vFlip{position:absolute;right:4px;bottom:4px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center}
+#vFlip svg{width:15px;height:15px}
+#vSheet{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;justify-content:flex-end}
+#vSheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.32)}
+#vSheet .sbody{position:relative;background:var(--bg);color:var(--tx);border-radius:22px 22px 0 0;max-height:74%;overflow:auto;padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+#vSheet .grab{width:38px;height:4px;border-radius:4px;background:var(--bd);margin:0 auto 10px}
+#vSheet h4{font-size:16px;margin:2px 0 10px}
+#vSheet label{display:block;font-size:12px;color:var(--mut);margin:12px 0 4px}
+#vSheet .mut{color:var(--mut);font-size:12.5px;margin:10px 0}
+.tl{margin:0 0 10px;padding:9px 13px;border-radius:14px;max-width:90%;overflow-wrap:anywhere;font-size:14px;line-height:1.65;white-space:pre-wrap}
+.tl.u{background:var(--chip);margin-left:auto}
+.tl.m{border:1px solid var(--bd)}
+@media(prefers-reduced-motion:reduce){#vo .orb,#vo .ball,#vDot{animation:none!important}}
+/* thinking box */
+.think-box{border:1px solid var(--bd);border-radius:10px;margin:4px 0 10px;overflow:hidden;background:var(--code)}
+.think-box>summary{padding:7px 12px;cursor:pointer;color:var(--mut);font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px;list-style:none;user-select:none}
+.think-box>summary::-webkit-details-marker{display:none}
+.think-box>summary svg{width:13px;height:13px}
+.think-box .tbc{padding:10px 12px;font-size:12px;color:var(--mut);white-space:pre-wrap;border-top:1px solid var(--bd);max-height:240px;overflow-y:auto;line-height:1.6;overflow-wrap:anywhere}
+
+/* typing + streaming */
+.typing{display:inline-flex;align-items:center;gap:10px;color:var(--mut);font-size:13px;padding:4px 0}
+.typing .dt{display:inline-flex;gap:4px}
+.typing .dt i{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--tx),var(--mut));opacity:.4;animation:wv 1.1s ease-in-out infinite}
+.typing .dt i:nth-child(2){animation-delay:.14s}.typing .dt i:nth-child(3){animation-delay:.28s}
+@keyframes wv{0%,60%,100%{transform:translateY(0) scale(.8);opacity:.35}30%{transform:translateY(-5px) scale(1);opacity:1}}
+.shim{background:linear-gradient(90deg,var(--mut) 0%,var(--tx) 50%,var(--mut) 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 1.8s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.caret{display:inline-block;width:2px;height:1.05em;margin-left:2px;vertical-align:-.15em;background:var(--tx);border-radius:1px;animation:cb .9s steps(1) infinite}
+@keyframes cb{50%{opacity:0}}
+.m.a.live .lg svg{animation:lp 1.4s ease-in-out infinite}
+@keyframes lp{50%{transform:scale(1.18);opacity:.55}}
+/* follow-up suggestions */
+.sugg{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.sl{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);margin-bottom:2px}
+.sl svg{width:13px;height:13px}
+.sugg button{align-self:flex-start;text-align:left;border:1px solid var(--bd);border-radius:14px;padding:7px 13px;font-size:13px;line-height:1.4;background:var(--bg);animation:up .38s cubic-bezier(.2,.8,.2,1) both;transition:background .15s,border-color .15s}
+.sugg button:nth-of-type(2){animation-delay:.07s}.sugg button:nth-of-type(3){animation-delay:.14s}
+.sugg button:hover{background:var(--chip);border-color:var(--hl)}
+@keyframes up{from{opacity:0;transform:translateY(8px)}}
+/* app builder */
+#bld{display:none;flex:1;min-height:0;flex-direction:column}
+.appv #scroll,.appv #cw,.appv #gal{display:none}.appv #bld{display:flex}
+.bh{display:flex;align-items:center;gap:8px;padding:2px 14px 10px}
+.bh b{font-size:16px}.bh .sp{flex:1}
+.bmod{font-size:12px;color:var(--mut);max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bbody{flex:1;min-height:0;display:flex;gap:14px;padding:0 14px 14px}
+.bl{width:330px;flex:none;overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px}
+.bl textarea{resize:vertical}
+.br{flex:1;min-width:0;display:flex;flex-direction:column;border:1px solid var(--bd);border-radius:16px;overflow:hidden;background:var(--card)}
+.seg{display:flex;gap:4px;background:var(--chip);padding:3px;border-radius:11px}
+.seg button{flex:1;padding:6px;border-radius:9px;font-size:13px}
+.seg button.on{background:var(--bg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.bw{width:100%;display:flex;justify-content:center;align-items:center;gap:6px}
+.btabs{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.btabs .sp{flex:1}
+.btabs .btn{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;font-size:13px}
+.btabs .tb{padding:5px 12px;border-radius:9px;font-size:13px;color:var(--mut)}
+.btabs .tb.on{background:var(--chip);color:var(--tx)}
+.bst{flex:1;position:relative;min-height:0;background:#fff}
+#bFrame{width:100%;height:100%;border:0;background:#fff;display:block}
+#bCode{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:0;resize:none;padding:12px;font:12.5px/1.6 ui-monospace,Menlo,Consolas,monospace;background:var(--code);white-space:pre;overflow:auto;tab-size:2}
+#bEmpty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--mut);background:var(--bg);font-size:13px;line-height:1.7}
+#bBusy{position:absolute;left:12px;bottom:12px;background:var(--bg);border:1px solid var(--bd);padding:7px 14px;border-radius:999px;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+#bX{display:none;position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:10px;z-index:71;width:38px;height:38px;border-radius:50%;background:var(--ink);color:var(--inkt);place-items:center}
+.bfull .bst{position:fixed;inset:0;z-index:70}
+.bfull #bX{display:grid}.bfull #bBusy{display:none}
+.hi.al .d{opacity:1}
+@media(max-width:800px){.bbody{flex-direction:column;overflow:auto}.bl{width:auto;overflow:visible}.br{flex:none;height:78vh;min-height:420px}}
+#sb.hide{box-shadow:none!important}
+#eQ[hidden]{display:none}#eQ{flex-wrap:nowrap;overflow-x:auto;margin-bottom:8px;padding-bottom:2px}
+.dlg{display:inline-block;font-size:12px;color:var(--mut);margin:0 0 6px;text-decoration:underline}
+/* PWA / safe areas */
+body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+body #top{padding-top:calc(8px + env(safe-area-inset-top,0px))}
+body #sb{padding-top:calc(14px + env(safe-area-inset-top,0px))}
+body #cw{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+@media(prefers-reduced-motion:reduce){.typing .dt i,.shim,.caret,.m.a.live .lg svg,.sugg button{animation:none!important}}
+.cav{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--chip);font-size:15px;line-height:1;overflow:hidden;flex:none;color:var(--tx)}
+.cav img{width:100%;height:100%;object-fit:cover}
+.cav.sm{width:18px;height:18px;font-size:12px}
+.cav.xl{width:56px;height:56px;font-size:32px}
+.cprev{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--bd);border-radius:14px;margin:10px 0}
+.avg{display:flex;flex-wrap:wrap;gap:6px}
+.avb{width:40px;height:40px;border:1px solid var(--bd);border-radius:12px;font-size:20px;background:var(--bg)}
+.avb.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset}
+.team{display:flex;flex-direction:column;gap:6px;margin:4px 0 10px}
+.stg{border:1px solid var(--bd);border-radius:12px;background:var(--card);overflow:hidden}
+.stg summary{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:13px;list-style:none}
+.stg summary::-webkit-details-marker{display:none}
+.stg summary i{margin-left:auto;font-style:normal;color:var(--mut);font-size:12px}
+.stg.run summary i{color:#d98200}.stg.done summary i{color:#1a9b55}.stg.err summary i{color:var(--err)}
+.stg .sbx{padding:2px 12px 10px;font-size:13px;max-height:360px;overflow:auto}
+.tbtn{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.tbtn .btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:6px 12px}
+.m.u .acts{justify-content:flex-end;opacity:.55}
+.btn:disabled{opacity:.4;pointer-events:none}
+.xo{justify-content:flex-start;text-align:left;margin-top:8px;gap:12px;padding:10px 14px}
+.xo small{display:block;color:var(--mut);font-weight:400;font-size:12px}
+.ver{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border:1px solid var(--bd);border-radius:12px;margin-top:8px}
+.ver.on{border-color:var(--ink)}.ver small{color:var(--mut)}.ver .vn{font-size:13px;margin-top:2px;overflow-wrap:anywhere}
+.ver .btn{padding:4px 10px;font-size:12px;margin-left:4px;display:inline-flex;align-items:center}
+#tCopy{display:inline-flex;align-items:center;gap:6px}
+</style>
+</head>
+<body class="empty">
+<aside id="sb">
+  <div class="brand"><span id="logoS"></span>Mayra AI<span class="sp"></span><button class="ib" id="sbx" title="Close sidebar"></button></div>
+  <button class="nb" id="nNew"></button>
+  <button class="nb" id="nSearch"></button>
+  <input id="qs" placeholder="Search chats…" aria-label="Search chats">
+  <button class="nb" id="nImg"></button>
+  <button class="nb" id="nComp"></button>
+  <button class="nb" id="nTeam"></button>
+  <div class="lbl">Chats history</div>
+  <div id="hist"></div>
+  <button class="nb" id="nHelp"></button>
+  <button class="nb" id="nTools"></button>
+  <button class="nb" id="nInstall" hidden></button>
+  <button class="nb" id="nSet"></button>
+  <div class="user" id="uRow" role="button" tabindex="0"><div class="av" id="uav">F</div><div><span id="uname">Friend</span><small id="uprov">No API key yet</small></div></div>
+</aside>
+<main>
+  <div id="top"><button class="ib" id="sbo" title="Open sidebar"></button><span class="sp"></span><button class="btn" id="tCopy" hidden></button><button class="btn" id="tSum" hidden></button><button class="btn" id="tSet"></button></div>
+  <div id="scroll">
+    <section id="home">
+      <div id="logoB"></div>
+      <h1 id="greet">Good morning</h1>
+      <p class="s">How can I help you today?</p>
+    </section>
+    <div id="msgs"></div>
+  </div>
+  <div id="gal"><h2 style="font-size:17px">Images</h2><div class="grid" id="grid"></div></div>
+  <div id="bld">
+    <div class="bh"><button class="ib" id="bBack" title="Back"></button><b>Live Website Builder</b><span class="sp"></span><span class="bmod" id="bModel"></span></div>
+    <div class="bbody">
+      <section class="bl">
+        <div class="seg"><button data-bt="app">App</button><button data-bt="game">Game</button><button data-bt="web">Website</button></div>
+        <textarea id="bP" rows="5" aria-label="Describe what to build"></textarea>
+        <div class="chips" id="bIdeas" style="justify-content:flex-start"></div>
+        <button class="btn p bw" id="bGo"></button>
+        <div id="bEditBox" hidden>
+          <div class="lbl" style="padding:6px 0 4px">Ask for changes (live preview)</div>
+          <textarea id="bE" rows="2" placeholder="e.g. Make the buttons bigger and add a dark mode"></textarea>
+          <button class="btn bw" id="bEdit" style="margin-top:8px"></button>
+          <div class="chips" id="bQuick" style="justify-content:flex-start;margin-top:8px"></div>
+        </div>
+        <div class="lbl" style="padding:10px 0 2px">My apps<span style="flex:1"></span><button class="ib" id="bNew" title="New project"></button></div>
+        <div id="bList"></div>
+      </section>
+      <section class="br">
+        <div class="btabs">
+          <button class="tb" data-bv="prev">Preview</button><button class="tb" data-bv="code">Code</button><span class="sp"></span>
+          <button class="btn" id="bRun"></button><button class="btn" id="bCp"></button><button class="btn" id="bPlay"></button><button class="btn" id="bUndo"></button><button class="btn" id="bRedo"></button><button class="btn" id="bHist"></button><button class="btn" id="bExp"></button><button class="btn p" id="bDl"></button>
+        </div>
+        <div class="bst">
+          <iframe id="bFrame" title="Preview" sandbox="allow-scripts allow-modals allow-pointer-lock allow-forms allow-popups"></iframe>
+          <textarea id="bCode" spellcheck="false" autocapitalize="off" autocomplete="off" hidden></textarea>
+          <div id="bEmpty"><div>Describe an app or a game and tap <b>Build</b>.<br>Then review the code, edit it, play it here and download it.</div></div>
+          <div id="bBusy" hidden><span class="typing"><span class="dt"><i></i><i></i><i></i></span><span class="shim">Building…</span></span></div>
+          <button class="ib" id="bX" title="Close"></button>
+        </div>
+      </section>
+    </div>
+  </div>
+  <div id="cw">
+    <div id="comp">
+      <div class="chips" id="eQ" hidden style="justify-content:flex-start"></div>
+      <div id="prev"></div>
+      <div class="ir"><textarea id="inp" rows="1" placeholder="Message Mayra AI…" aria-label="Message"></textarea>
+        <div class="rg"><button id="send" aria-label="Send"></button><button id="vc" title="Start voice chat" aria-label="Start voice chat"></button></div></div>
+      <div class="cr">
+        <button class="ib" id="att" title="Attach image"></button>
+        <button class="chip" id="cImg"></button>
+        <button class="chip" id="cBuild"></button>
+        <button class="chip" id="cThink"></button>
+        <button class="chip" id="cTeam"></button>
+        <button class="chip" id="cComp"></button>
+        <span class="sp"></span>
+        <button id="mb"><span id="mbl">Select model</span></button>
+        <div id="menu"></div>
+      </div>
+    </div>
+    <div id="extra">
+      <div class="chips" id="qk"></div>
+      <div><div class="am"><span>Available Models</span><span id="mc"></span></div><div class="cards" id="cards"></div></div>
+    </div>
+  </div>
+</main>
+<div id="vo" role="dialog" aria-label="Live voice chat" data-s="idle">
+  <div class="vtop">
+    <div class="vpill"><i id="vDot"></i><span id="vPill">Live</span></div>
+    <div class="vsp"></div>
+    <button class="vc" id="vBook" aria-label="Transcript">📖</button>
+    <button class="vc" id="vBrain" aria-label="Memory and voice">🧠</button>
+  </div>
+  <div id="vCam" hidden><video id="vVid" playsinline muted autoplay></video><button id="vFlip" aria-label="Flip camera"></button></div>
+  <div class="vstage"><button id="vOrb" class="orb" aria-label="Tap to interrupt"><span class="halo"></span><span class="ring"></span><span class="ball"></span></button></div>
+  <div id="vTx" aria-live="polite"></div>
+  <div class="vbar">
+    <div class="vin"><input id="vIn" placeholder="চাইলে লিখুনও…" enterkeyhint="send" autocomplete="off" aria-label="Type a message"><button id="vSendT" hidden aria-label="Send"></button></div>
+    <button class="vc" id="vCamB" aria-label="Camera"></button>
+    <button class="vc" id="vMute" aria-label="Microphone"></button>
+    <button class="vc vx" id="vEnd" aria-label="End live chat"></button>
+  </div>
+  <div id="vSheet" hidden><div class="scrim"></div><div class="sbody"><div class="grab"></div><div id="vSb"></div></div></div>
+</div>
+<div id="ov"><div id="mod" role="dialog" aria-modal="true"></div></div>
+<input type="file" id="file" accept="image/*" multiple hidden><input type="file" id="impF" accept="application/json,.json" hidden>
+<div id="toast"></div>
+
+<script>
+/* Persistent storage: IndexedDB (big, durable) with a small localStorage copy as backup. The app starts after it is loaded. */
+var KV=(function(){
+ var mem={},db=null,ok=false;
+ var ready=new Promise(function(res){
+  var done=false;function fin(){if(!done){done=true;res()}}
+  setTimeout(fin,4000);
+  try{
+   var rq=indexedDB.open('mayra',1);
+   rq.onupgradeneeded=function(){rq.result.createObjectStore('kv')};
+   rq.onerror=rq.onblocked=fin;
+   rq.onsuccess=function(){
+    db=rq.result;ok=true;
+    try{
+     var tx=db.transaction('kv','readonly'),st=tx.objectStore('kv'),ra=st.getAll(),rk=st.getAllKeys();
+     tx.oncomplete=function(){
+      rk.result.forEach(function(k,i){mem[k]=ra.result[i]});
+      ['aivora_s','aivora_c','aivora_or','mayra_apps'].forEach(function(k){   /* first run / recovery: bring over old localStorage data */
+       if(!(k in mem)){try{var v=localStorage.getItem(k);if(v!==null){mem[k]=v;put(k,v)}}catch(e){}}
+      });
+      fin();
+     };
+     tx.onerror=tx.onabort=function(){ok=false;fin()};
+    }catch(e){ok=false;fin()}
+   };
+  }catch(e){fin()}
+ });
+ function put(k,v){try{var tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(v,k);tx.onerror=function(){}}catch(e){}}
+ function get(k){if(k in mem)return mem[k];try{return localStorage.getItem(k)}catch(e){return null}}
+ function set(k,v){
+  mem[k]=v;var saved=false;
+  if(ok&&db){try{put(k,v);saved=true}catch(e){}}
+  try{if(v.length<150000)localStorage.setItem(k,v);else localStorage.removeItem(k);saved=true}catch(e){}
+  return saved;
+ }
+ function del(k){delete mem[k];if(ok&&db){try{db.transaction('kv','readwrite').objectStore('kv').delete(k)}catch(e){}}try{localStorage.removeItem(k)}catch(e){}}
+ return{ready:ready,get:get,set:set,del:del,isDB:function(){return ok}};
+})();
+KV.ready.then(function(){var el=document.createElement('script');el.textContent=document.getElementById('mainjs').textContent;document.body.appendChild(el)});
+</script>
+<script type="text/plain" id="mainjs">
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const IC={
+plus:'<path d="M12 5v14M5 12h14"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+clip:'<path d="M21 12.5l-8.5 8.5a5 5 0 01-7-7L14 5.5a3.3 3.3 0 014.7 4.7L10 19a1.7 1.7 0 01-2.4-2.4l7.5-7.5"/>',
+arrow:'<path d="M12 19V5M5 12l7-7 7 7"/>',stop:'<rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>',
+set:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01"/>',
+grid:'<rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/>',
+menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',side:'<path d="M4 5h16v14H4zM9 5v14"/>',
+copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/>',
+trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/>',
+globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18"/>',
+down:'<path d="M6 9l6 6 6-6"/>',
+mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',
+micoff:'<path d="M3 3l18 18"/><path d="M9 9v2a3 3 0 005 2M15 9V6a3 3 0 00-5.6-1.5M5 11a7 7 0 0011 5.6M19 11a7 7 0 01-.6 2.8M12 18v3"/>',
+wave:'<path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/>',
+speaker:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/>',
+speakeroff:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/>',
+think:'<path d="M9 21h6M12 2a7 7 0 017 7c0 2.8-1.6 5.2-4 6.5V17H9v-1.5C6.6 14.2 5 11.8 5 9a7 7 0 017-7z"/>'};
+const ic=n=>`<svg viewBox="0 0 24 24">${IC[n]}</svg>`;
+Object.assign(IC,{
+code:'<path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/>',
+play:'<path d="M7 5l12 7-12 7z"/>',
+dl:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+back:'<path d="M15 6l-6 6 6 6"/>',
+spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+doc:'<path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h6M9 17h6"/>',
+wand:'<path d="M4 20L16 8M14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM19 12l.7 1.3L21 14l-1.3.7L19 16l-.7-1.3L17 14l1.3-.7z"/>',
+reload:'<path d="M20 12a8 8 0 10-2.3 5.7M20 5v5h-5"/>'});
+const logo=s=>`<svg viewBox="0 0 24 24" style="width:${s}px;height:${s}px;fill:currentColor;stroke:none"><rect x="3" y="8" width="2.4" height="8" rx="1.2"/><rect x="8" y="4" width="2.4" height="16" rx="1.2"/><rect x="13" y="7" width="2.4" height="10" rx="1.2"/><rect x="18" y="10" width="2.4" height="4" rx="1.2"/></svg>`;
+
+/* ---------- providers ---------- */
+const P={
+openai:{name:'OpenAI',type:'oai',base:'https://api.openai.com/v1',link:'https://platform.openai.com/api-keys',desc:"OpenAI's flagship models.",models:['gpt-4o','gpt-4o-mini','gpt-5']},
+gemini:{name:'Google Gemini',type:'gemini',link:'https://aistudio.google.com/apikey',desc:"Google's multimodal models.",models:['gemini-3.8-flash','gemini-3.1-flash-lite','gemini-3.1-pro-preview']},
+gemini25:{name:'Google AI Studio (2.5)',type:'gemini',link:'https://aistudio.google.com/apikey',desc:'Older Gemini 2.5 models. Use a separate AI Studio key.',models:['gemini-2.5-flash','gemini-2.5-flash-lite','gemini-2.5-pro']},
+anthropic:{name:'Anthropic Claude',type:'anthropic',link:'https://console.anthropic.com/settings/keys',desc:'Claude models, strong at writing and code.',models:['claude-sonnet-5-5','claude-haiku-5-5','claude-opus-5-5']},
+openrouter:{name:'OpenRouter',type:'oai',base:'https://openrouter.ai/api/v1',link:'https://openrouter.ai/keys',desc:'One key for hundreds of models.',models:['anthropic/claude-sonnet-5.5','google/gemini-2.5-flash','deepseek/deepseek-chat','nvidia/nemotron-3-ultra-550b-a55b:free']},
+cerebras:{name:'Cerebras',type:'oai',base:'https://api.cerebras.ai/v1',link:'https://cloud.cerebras.ai',desc:'Extremely fast inference with a free trial tier.',models:['gpt-oss-120b','qwen-3.8-27b']},
+huggingface:{name:'Hugging Face',type:'oai',base:'https://router.huggingface.co/v1',link:'https://huggingface.co/settings/tokens',desc:'Open models via Inference Providers. Token needs the "Make calls to Inference Providers" permission.',models:['openai/gpt-oss-120b','deepseek-ai/DeepSeek-R1','meta-llama/Llama-3.3-70B-Instruct']},
+deepseek:{name:'DeepSeek',type:'oai',base:'https://api.deepseek.com/v1',link:'https://platform.deepseek.com/api_keys',desc:'Low-cost reasoning and chat.',models:['deepseek-chat','deepseek-reasoner']},
+xai:{name:'xAI Grok',type:'oai',base:'https://api.x.ai/v1',link:'https://console.x.ai',desc:"xAI's Grok models.",models:['grok-4','grok-3-mini']},
+groq:{name:'Groq',type:'oai',base:'https://api.groq.com/openai/v1',link:'https://console.groq.com/keys',desc:'Very fast open-model inference.',models:['llama-3.3-70b-versatile','llama-3.1-8b-instant']},
+mistral:{name:'Mistral AI',type:'oai',base:'https://api.mistral.ai/v1',link:'https://console.mistral.ai/api-keys',desc:"Mistral's open and hosted models.",models:['mistral-large-latest','mistral-small-latest']}
+};
+const IMGP={stability:'Stability AI',openai:'OpenAI',gemini:'Google Gemini',xai:'xAI Grok'};
+
+/* ---------- state ---------- */
+const DEF={name:'Friend',theme:'light',keys:{},models:{},sel:'',sys:'',temp:.7,lVoice:'Zephyr',lLang:'bn',lModels:'gemini-3.8-live\ngemini-3.1-flash-live-preview\ngemini-2.5-flash-native-audio-preview-12-2025',lVad:'default',lExtra:'0',lNudge:true,lPers:'',lMem:'',lLast:'',imgProv:'auto',imgModels:{stability:'sd3.5-large',openai:'gpt-image-1',gemini:'gemini-3.1-flash-image',xai:'grok-2-image'}};
+let S=load('aivora_s',DEF);S.keys=S.keys||{};S.models=S.models||{};S.imgModels=Object.assign({},DEF.imgModels,S.imgModels);
+if(S.imgModels.gemini==='gemini-2.5-flash-image')S.imgModels.gemini=DEF.imgModels.gemini;
+if(S.models.gemini&&S.models.gemini.trim()==='gemini-2.5-flash\ngemini-2.5-flash-lite\ngemini-2.5-pro'){delete S.models.gemini}
+if((S.sel||'').startsWith('gemini::gemini-2.5-flash')&&!(S.sel||'').includes('lite'))S.sel='';
+let chats=load('aivora_c',[]),cur=null,pending=[],busy=false,ctrl=null,imgMode=false,thinkMode=false,view='chat';
+function load(k,d){try{const v=JSON.parse(KV.get(k));return v?(Array.isArray(d)?v:Object.assign({},d,v)):JSON.parse(JSON.stringify(d))}catch{return JSON.parse(JSON.stringify(d))}}
+function freeSpace(){
+ const c=[...chats].reverse().find(c=>c.msgs.some(m=>m.images?.length||m.gen));
+ if(!c)return false;
+ c.msgs.forEach(m=>{if(m.images?.length)m.images=[];if(m.gen){m.gen='';m.content=(m.content||'')+' [image removed to free storage]'}});
+ return true;
+}
+function saveC(){for(let i=0;i<60;i++){if(KV.set('aivora_c',JSON.stringify(chats)))return true;if(!freeSpace())return false}return false}
+/* settings (API keys) matter most: if storage is full, drop old chat images first, then retry */
+function saveS(){
+ for(let i=0;i<60;i++){
+  if(KV.set('aivora_s',JSON.stringify(S)))return true;
+  if(!freeSpace())break;saveC();
+ }
+ toast('Could not save settings. Free some browser storage.');return false;
+}
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2800)}
+const modelsOf=p=>S.models[p]?S.models[p].split('\n').map(s=>s.trim()).filter(Boolean):P[p].models;
+const avail=()=>Object.keys(P).filter(p=>S.keys[p]).flatMap(p=>modelsOf(p).map(m=>({p,m})));
+function getSel(){const a=avail();const [p,m]=(S.sel||'').split('::');return a.find(x=>x.p===p&&x.m===m)||a[0]||null}
+
+/* ---------- theme / static icons ---------- */
+function applyTheme(){const t=S.theme==='auto'?(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):S.theme;document.documentElement.dataset.theme=t;const tc=document.getElementById('tc');if(tc)tc.content=t==='dark'?'#161617':'#ffffff'}
+function initUI(){
+ $('#logoS').innerHTML=logo(20);$('#logoB').innerHTML=logo(32);
+ $('#sbx').innerHTML=ic('side');$('#sbo').innerHTML=ic('menu');
+ $('#nNew').innerHTML=ic('plus')+'New chat';$('#nSearch').innerHTML=ic('search')+'Search chats';$('#nImg').innerHTML=ic('image')+'Images';
+ $('#nHelp').innerHTML=ic('help')+'Help &amp; FAQ';$('#nTools').innerHTML=ic('grid')+'Explore Tools';$('#nSet').innerHTML=ic('set')+'Settings';
+ $('#tSet').innerHTML=ic('set')+'<span class="tt"> Settings</span>';
+ $('#att').innerHTML=ic('clip');$('#cImg').innerHTML=ic('image')+'Create an image';$('#cBuild').innerHTML=ic('code')+'App &amp; Website';$('#tSum').innerHTML=ic('doc')+'<span class="tt"> Summary</span>';$('#nInstall').innerHTML=ic('dl')+'Install app';$('#bBack').innerHTML=ic('back');$('#bNew').innerHTML=ic('plus');$('#bX').innerHTML=ic('xx');$('#bRun').innerHTML=ic('reload')+'<span class="tt">Run</span>';$('#bCp').innerHTML=ic('copy')+'<span class="tt">Copy</span>';$('#bPlay').innerHTML=ic('play')+'<span class="tt">Play</span>';$('#bDl').innerHTML=ic('dl')+'<span class="tt">Download</span>';$('#cThink').innerHTML=ic('think')+'Think deeply';$('#cTeam').innerHTML=ic('users')+'AI Team';$('#nComp').innerHTML=ic('heart')+'AI Companion';$('#nTeam').innerHTML=ic('users')+'AI Team';$('#tCopy').innerHTML=ic('copy')+'<span class="tt"> Copy all</span>';$('#bUndo').innerHTML=ic('undo')+'<span class="tt">Undo</span>';$('#bRedo').innerHTML=ic('redo')+'<span class="tt">Redo</span>';$('#bHist').innerHTML=ic('hist')+'<span class="tt">History</span>';$('#bExp').innerHTML=ic('box')+'<span class="tt">Export</span>';
+ $('#mb').innerHTML+=ic('down');
+ $('#eQ').innerHTML=EQ.map(([l,v])=>`<button class="chip" data-eq="${ea(v)}">${l}</button>`).join('');
+ $('#qk').innerHTML=[['Help me write','Help me write '],['Learn about','Teach me about '],['Analyze Image','@img'],['Summarize text','Summarize this text:\n\n'],['See More','@tools']].map(([l,v])=>`<button class="chip" data-q="${esc(v)}">${l}</button>`).join('');
+ vInitUI();
+ paintSend();
+}
+function paintSend(){
+ $('#send').innerHTML=busy?ic('stop'):ic('arrow');$('#vc').innerHTML=ic('wave');
+ const has=busy||$('#inp').value.trim()||pending.length;
+ $('#send').style.display=has?'grid':'none';$('#vc').style.display=has?'none':'grid';
+}
+
+/* ---------- rendering ---------- */
+function greet(){const h=new Date().getHours();return`${h<12?'Good morning':h<18?'Good afternoon':'Good evening'}, ${esc(S.name||'Friend')}`}
+function renderSide(){
+ const q=$('#qs').value.toLowerCase();
+ $('#hist').innerHTML=chats.filter(c=>!q||c.title.toLowerCase().includes(q)||c.msgs.some(m=>(m.content||'').toLowerCase().includes(q))).map(c=>`<div class="hi ${c.id===cur?'on':''}"><button class="t" data-open="${c.id}">${esc(c.title)}</button><button class="d" data-del="${c.id}" title="Delete">${ic('trash')}</button></div>`).join('')||'<div class="lbl">No chats yet</div>';
+ $('#uname').textContent=S.name||'Friend';$('#uav').textContent=(S.name||'F')[0].toUpperCase();
+ const s=getSel();$('#uprov').textContent=s?P[s.p].name:'No API key yet';
+ document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));if(view==='gal')$('#nImg').classList.add('on')
+}
+function renderModels(){
+ const a=avail(),s=getSel();
+ $('#mbl').textContent=s?s.m:'Add API key';
+ $('#mc').innerHTML=a.length?`${a.length} models`:'';
+ $('#cards').innerHTML=a.length?a.map(x=>`<button class="card ${s&&s.p===x.p&&s.m===x.m?'on':''}" data-pick="${esc(x.p+'::'+x.m)}"><small style="height:auto;margin:0">${P[x.p].name}</small><b>${esc(x.m)}</b><small>${esc(P[x.p].desc)}</small></button>`).join(''):`<button class="card" data-act="settings" style="flex-basis:260px"><b>Add your API key</b><small>Open Settings and paste a key from OpenAI, Gemini, Claude, OpenRouter and more. Models appear here automatically.</small></button>`;
+ $('#menu').innerHTML=a.length?Object.keys(P).filter(p=>S.keys[p]).map(p=>`<h6>${P[p].name}</h6>`+modelsOf(p).map(m=>`<button data-pick="${esc(p+'::'+m)}" class="${s&&s.p===p&&s.m===m?'on':''}">${esc(m)}</button>`).join('')).join(''):'<button data-act="settings">Add an API key in Settings</button>';
+ if(S.keys.openrouter)$('#menu').innerHTML+='<h6>OpenRouter</h6><button data-act="orBrowse">Browse all OpenRouter models…</button>';
+}
+function md(src){
+ const bl=[];
+ src=src.replace(/```([\w+-]*)\n?([\s\S]*?)(```|$)/g,(m,l,c)=>{bl.push(`<div class="code"><div class="ch"><span>${esc(l||'code')}</span><button data-copy>Copy</button></div><pre><code>${esc(c.replace(/\n$/,''))}</code></pre></div>`);return`\u0000${bl.length-1}\u0000`});
+ const inl=t=>t.replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>').replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+ const out=[];let para=[],list=null;
+ const fp=()=>{if(para.length)out.push('<p>'+para.join('<br>')+'</p>');para=[]},fl=()=>{if(list)out.push(`</${list}>`);list=null};
+ for(const line of esc(src).split('\n')){let m;
+  if(!line.trim()){fp();fl()}
+  else if(m=line.match(/^(#{1,4})\s+(.*)/)){fp();fl();out.push(`<h${Math.min(m[1].length+1,4)}>${inl(m[2])}</h${Math.min(m[1].length+1,4)}>`)}
+  else if(m=line.match(/^\s*[-*]\s+(.*)/)){fp();if(list!=='ul'){fl();out.push('<ul>');list='ul'}out.push(`<li>${inl(m[1])}</li>`)}
+  else if(m=line.match(/^\s*\d+[.)]\s+(.*)/)){fp();if(list!=='ol'){fl();out.push('<ol>');list='ol'}out.push(`<li>${inl(m[1])}</li>`)}
+  else if(/^\u0000\d+\u0000$/.test(line)){fp();fl();out.push(line)}
+  else{fl();para.push(inl(line))}}
+ fp();fl();
+ return out.join('').replace(/\u0000(\d+)\u0000/g,(m,i)=>bl[i]);
+}
+const genH=m=>m.gen?`<img class="g" src="${esc(m.gen)}" alt="Generated image"><a class="dlg" href="${esc(m.gen)}" download="mayra-image.${imgExt(m.gen)}">Download</a>`:'';
+function msgHTML(m,i,last){
+ if(m.role==='user')return`<div class="m u"><div>${m.images?.length?`<div class="ims">${m.images.map(s=>`<img src="${s}" alt="">`).join('')}</div>`:''}${m.content?`<div class="bd">${esc(m.content)}</div><div class="acts"><button class="ib" data-mc="${i}" title="Copy">${ic('copy')}</button></div>`:''}</div></div>`;
+ let b='';
+ if(m.err)b=`<span class="err">${esc(m.err)}</span>`;
+ else if(m.team)b=teamHTML(m)+md(m.content||'')+teamBtns(m,i);
+  else if(!m.content&&!m.gen&&busy&&last)b=typ();
+ else b=md(m.content||'')+genH(m);
+ const thinkH=m.thinking?`<details class="think-box"><summary>${ic('think')}<span>চিন্তা দেখুন</span></summary><div class="tbc">${esc(m.thinking)}</div></details>`:'';
+ const sg=last&&!busy&&m.sugg&&m.sugg.length?suggHTML(m.sugg):'';
+ return`<div class="m a${busy&&last?' live':''}"><div class="lg">${compLogo()}</div><div class="bd">${thinkH}${b}<div class="acts"><button class="ib" data-mc="${i}" title="Copy">${ic('copy')}</button></div>${sg}</div></div>`;
+}
+function render(){
+ const c=chats.find(c=>c.id===cur);
+ document.body.className=(view==='gal'?'galv ':'')+(view==='app'?'appv ':'')+(c&&c.msgs.length?'chatting':'empty');
+ $('#tSum').hidden=!(c&&c.msgs.length&&view==='chat');
+ $('#greet').innerHTML=greet();
+ $('#msgs').innerHTML=c?c.msgs.map((m,i)=>msgHTML(m,i,i===c.msgs.length-1)).join(''):'';
+ renderSide();renderModels();
+ $('#cImg').classList.toggle('on',imgMode);$('#eQ').hidden=!pending.length;$('#cThink').classList.toggle('on',thinkMode);paintComp();
+ $('#grid').innerHTML=chats.flatMap(c=>c.msgs.filter(m=>m.gen).map(m=>m.gen)).reverse().map(s=>`<a href="${esc(s)}" download="mayra-image.${imgExt(s)}" target="_blank"><img src="${esc(s)}" alt="Generated image"></a>`).join('')||'<p style="color:var(--mut)">No images yet. Turn on “Create an image” and describe what you want.</p>';
+ const sc=$('#scroll');sc.scrollTop=sc.scrollHeight;
+ if(view==='app')bPaint();
+}
+function paintLast(){
+ const c=chats.find(c=>c.id===cur),m=c.msgs[c.msgs.length-1],el=$('#msgs').lastElementChild?.querySelector('.bd');
+ if(!el)return;const t=el.querySelector('.acts');
+ if(m.team){el.innerHTML=teamHTML(m)+(m.content?md(m.content):'')+(t?t.outerHTML:'');const sc0=$('#scroll');if(sc0.scrollHeight-sc0.scrollTop-sc0.clientHeight<160)sc0.scrollTop=sc0.scrollHeight;return}
+ const thinkH=m.thinking?`<details class="think-box" open><summary>${ic('think')}<span>চিন্তা করছে…</span></summary><div class="tbc">${esc(m.thinking)}</div></details>`:'';
+ el.innerHTML=thinkH+(m.err?`<span class="err">${esc(m.err)}</span>`:(!m.content&&!m.gen?typ():(busy?caret(md(m.content||'')):md(m.content||''))+genH(m)))+(t?t.outerHTML:'');
+ const sc=$('#scroll');if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<160)sc.scrollTop=sc.scrollHeight;
+}
+
+/* ---------- API ---------- */
+async function readErr(r){let t=await r.text();try{const j=JSON.parse(t);t=j.error?.message||j.error||j.message||t;if(typeof t!=='string')t=JSON.stringify(t)}catch{}return`${P_name||'API'} error ${r.status}: ${String(t).slice(0,400)}`}
+let P_name='';
+async function sse(r,cb){const rd=r.body.getReader(),dc=new TextDecoder();let buf='';
+ for(;;){const{done,value}=await rd.read();if(done)break;buf+=dc.decode(value,{stream:true});const ls=buf.split('\n');buf=ls.pop();
+  for(const l of ls){const t=l.trim();if(t.startsWith('data:')){const d=t.slice(5).trim();if(d&&d!=='[DONE]'){try{cb(JSON.parse(d))}catch{}}}}}}
+const b64=u=>u.split(',')[1],mime=u=>u.slice(5,u.indexOf(';'));
+function history(c){return c.msgs.slice(0,-1).filter(m=>!m.err&&(m.role==='user'||m.content||m.gen)).map(m=>({role:m.role,content:m.content||(m.gen?'[generated an image]':''),images:m.images||[]}))}
+async function chatStream(sel,c,am){
+ const{p,m}=sel,pr=P[p],key=S.keys[p],h=history(c);P_name=pr.name;
+ const temp=+S.temp;
+ const identityP='তুমি '+(comp()?comp().name+' (Mayra AI-র companion)':'Mayra AI')+'। তোমাকে Rayhan sir বানাইছেন। কেউ যদি জিজ্ঞেস করে "তোমাকে কে বানিয়েছে", "তোমার মালিক কে", "তুমি কার AI", "তুমি কে" বা এ ধরনের যেকোনো পরিচয়-সম্পর্কিত প্রশ্ন করে — সবসময় উত্তর দেবে: "আমাকে Rayhan sir বানাইছে।"';
+ const thinkP=thinkMode?'এই প্রশ্নের উত্তর দেওয়ার আগে ধাপে ধাপে গভীরভাবে চিন্তা করো। উত্তরটি সুন্দরভাবে সাজিয়ে, স্পষ্ট শিরোনাম ও বিভাগ ব্যবহার করে বিস্তারিতভাবে দাও।':'';
+ const sysT=[(S.sys||'').trim(),compPrompt(),identityP,thinkP].filter(Boolean).join('\n\n');
+ const add=t=>typeIn(am,t);
+  if(pr.type==='oai'){
+  const msgs=[];if(sysT)msgs.push({role:'system',content:sysT});
+  h.forEach(x=>msgs.push({role:x.role,content:x.images.length?[{type:'text',text:x.content||' '},...x.images.map(u=>({type:'image_url',image_url:{url:u}}))]:x.content}));
+  const r=await fetch(pr.base+'/chat/completions',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},body:JSON.stringify({model:m,messages:msgs,stream:true,temperature:temp})});
+  if(!r.ok)throw new Error(await readErr(r));
+  await sse(r,j=>{const d=j.choices?.[0]?.delta;if(d?.content)add(d.content)});
+ }else if(pr.type==='anthropic'){
+  const msgs=h.map(x=>({role:x.role,content:x.images.length?[...x.images.map(u=>({type:'image',source:{type:'base64',media_type:mime(u),data:b64(u)}})),{type:'text',text:x.content||' '}]:x.content}));
+  const body={model:m,max_tokens:thinkMode?16000:4096,messages:msgs,stream:true};
+  if(thinkMode){body.thinking={type:'enabled',budget_tokens:10000};body.temperature=1}else{body.temperature=Math.min(1,temp)}
+  if(sysT)body.system=sysT;
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await readErr(r));
+  await sse(r,j=>{
+   if(j.type==='content_block_delta'){
+    if(j.delta?.type==='thinking_delta'&&j.delta.thinking){am.thinking=(am.thinking||'')+j.delta.thinking;paintLast()}
+    else if(j.delta?.text)add(j.delta.text);
+   }
+   if(j.type==='error')throw new Error(j.error?.message);
+  });
+ }else{
+  const contents=h.map(x=>({role:x.role==='user'?'user':'model',parts:[...x.images.map(u=>({inlineData:{mimeType:mime(u),data:b64(u)}})),{text:x.content||' '}]}));
+  const body={contents,generationConfig:{temperature:Math.min(2,temp)}};if(sysT)body.systemInstruction={parts:[{text:sysT}]};
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:streamGenerateContent?alt=sse`,{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await readErr(r));
+  await sse(r,j=>{(j.candidates?.[0]?.content?.parts||[]).forEach(x=>{if(x.text)add(x.text)})});
+ }
+ await typeDone(am);
+ if(!am.content)am.content='(Empty response. Try another model.)';
+}
+function lastPhoto(c){
+ if(!c)return'';let U=-1,G=-1;
+ for(let i=c.msgs.length-1;i>=0&&i>=c.msgs.length-14;i--){const m=c.msgs[i];
+  if(U<0&&m.role==='user'&&m.images&&m.images.length&&m.images[0].startsWith('data:'))U=i;
+  if(G<0&&m.role==='assistant'&&m.gen&&m.gen.startsWith('data:'))G=i;}
+ if(G>U&&!c.msgs[G].scratch)return c.msgs[G].gen;
+ if(U>=0)return c.msgs[U].images[0];
+ return G>=0?c.msgs[G].gen:'';
+}
+async function genImage(prompt,am){
+ am.gen=await runImage(prompt,[],am,prompt);am.scratch=true;if(!am.content)am.content='Here is your image.';
+}
+
+/* ---------- actions ---------- */
+function newChat(){cur=null;view='chat';pending=[];paintPrev();render();$('#inp').focus();closeSide()}
+function stop(){ctrl?.abort()}
+async function send(){
+ if(busy)return stop();
+ const text=$('#inp').value.trim();if(!text&&!pending.length)return;
+ const sel=getSel();
+ const c0=chats.find(c=>c.id===cur);
+ const lp=lastPhoto(c0),hasPics=pending.length>0,wantsEdit=!!text&&EDIT_RE.test(text);
+ /* photo attached + instruction = ALWAYS edit that photo (never text-to-image); no photo attached = use the last photo in this chat */
+ const doEdit=hasPics?(imgMode||editMode||wantsEdit):(!!lp&&(editMode||wantsEdit));
+ let editImgs=[];
+ if(doEdit){
+  if(!text){toast('কী বদলাতে চান সেটা লিখুন');return}
+  editImgs=hasPics?pending.slice(0,2):[lp];
+  editImgs=[].concat(editImgs||[]).filter(u=>u&&u.startsWith('data:'));
+  if(!editImgs.length){toast('আগে একটা ছবি attach করুন (📎)');return}
+ }
+ if(!imgMode&&!doEdit&&!sel){toast('Add an API key first');openSettings();return}
+ let c=chats.find(c=>c.id===cur);
+ if(!c){c={id:Date.now().toString(36),title:(text||'Image chat').slice(0,40),msgs:[],ts:Date.now()};chats.unshift(c);cur=c.id}
+ c.msgs.forEach(x=>{delete x.sugg});
+ c.msgs.push({role:'user',content:text,images:pending.slice()});
+ const am={role:'assistant',content:'',thinking:''};c.msgs.push(am);
+ $('#inp').value='';autoGrow();pending=[];paintPrev();
+ busy=true;paintSend();ctrl=new AbortController();render();
+ let ok=true;
+ try{doEdit?await editPhoto(text,editImgs,am):imgMode?await genImage(text,am):teamMode?await runTeam(text,c,am,sel):await chatStream(sel,c,am)}
+ catch(e){ok=false;typeFlush(am);if(e.name==='AbortError'){if(!am.content&&!am.gen)am.content='(Stopped)'}else am.err=(e.message==='Failed to fetch'?'Network or CORS error. Check your internet and API key, and open this file through a web server (http://) if it still fails.':e.message)}
+ busy=false;paintSend();saveC();render();
+ if(ok&&sel&&am.content&&!am.gen&&!am.err&&S.sug!==false)suggest(c,am,sel);
+}
+function autoGrow(){const t=$('#inp');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,320)+'px';paintSend()}
+function paintPrev(){$('#eQ').hidden=!pending.length;$('#prev').innerHTML=pending.map((s,i)=>`<div><img src="${s}" alt=""><button data-rm="${i}" aria-label="Remove">×</button></div>`).join('');paintSend()}
+function shrink(f){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=im.width*k;cv.height=im.height*k;cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);res(cv.toDataURL('image/jpeg',.85))};im.onerror=()=>res(null);im.src=r.result};r.readAsDataURL(f)})}
+async function addFiles(fs){for(const f of fs){if(!f.type.startsWith('image/'))continue;const u=await shrink(f);if(u)pending.push(u)}paintPrev()}
+function closeSide(){if(innerWidth<=800)$('#sb').classList.add('hide')}
+
+/* ---------- modals ---------- */
+function modal(h){$('#mod').innerHTML=h;$('#ov').classList.add('open')}
+function closeModal(){$('#ov').classList.remove('open');render()}
+const X=`<button class="ib" data-act="close" aria-label="Close">${ic('menu').replace(/<path[^>]*>/,'<path d="M6 6l12 12M18 6L6 18"/>')}</button>`;
+function openSettings(){
+ const sec=(t)=>`<h3>${t}</h3>`;
+ modal(`<h2>Settings ${X}</h2><p style="color:var(--mut);font-size:13px">Keys and chats stay in this browser only.</p>
+ ${sec('Profile & look')}
+ <div class="row"><label>Your name</label><input id="sName" value="${esc(S.name)}"></div>
+ <div class="row"><label>Theme</label><select id="sTheme">${['light','dark','auto'].map(t=>`<option value="${t}" ${S.theme===t?'selected':''}>${t[0].toUpperCase()+t.slice(1)}</option>`).join('')}</select></div>
+ ${sec('API keys')}
+ ${Object.keys(P).map(p=>`<details ${S.keys[p]?'':''}><summary>${P[p].name}<i class="${S.keys[p]?'ok':''}">${S.keys[p]?'Key saved':'No key'}</i></summary><div class="in">
+  <input type="password" data-key="${p}" value="${esc(S.keys[p]||'')}" placeholder="Paste API key" autocomplete="off">
+  <textarea data-mod="${p}" rows="${Math.min(5,modelsOf(p).length+1)}" placeholder="One model ID per line">${esc(modelsOf(p).join('\n'))}</textarea>
+  <a href="${P[p].link}" target="_blank" rel="noopener">Get a ${P[p].name} key</a>${p==='openrouter'?'<button type="button" class="btn" data-act="orBrowse">Browse all OpenRouter models</button>':''}</div></details>`).join('')}
+ <details><summary>Stability AI (photo edit &amp; images)<i class="${S.keys.stability?'ok':''}">${S.keys.stability?'Key saved':'No key'}</i></summary><div class="in">
+  <input type="password" data-key="stability" value="${esc(S.keys.stability||'')}" placeholder="Paste Stability AI key (sk-...)" autocomplete="off">
+  <p class="vinfo" style="margin:0">Photo editing and image creation use this key first. Just write what you want in the chat.</p>
+  <a href="https://platform.stability.ai/account/keys" target="_blank" rel="noopener">Get a Stability AI key</a></div></details>
+ ${sec('Chat')}
+ <div class="row"><label>System prompt</label><textarea id="sSys" rows="3" placeholder="Optional. Example: Answer in Bangla, short and clear.">${esc(S.sys)}</textarea></div>
+ <div class="row"><label>Creativity</label><input id="sTemp" type="range" min="0" max="1" step="0.1" value="${S.temp}"></div>
+ <div class="row"><label>Follow-up ideas</label><select id="sSug"><option value="1" ${S.sug!==false?'selected':''}>On (AI suggests next questions)</option><option value="0" ${S.sug===false?'selected':''}>Off (saves API calls)</option></select></div>
+ ${sec('Live voice chat (Gemini Live)')}
+ <div class="row"><label>Live models</label><textarea id="sLM" rows="3" placeholder="One model ID per line. Tried in order.">${esc(S.lModels)}</textarea></div>
+ <div class="row"><label>Captions</label><select id="sLC"><option value="1" ${S.lCap!=='0'?'selected':''}>On (text under the circle)</option><option value="0" ${S.lCap==='0'?'selected':''}>Off (bare setup, fastest)</option></select></div>
+ <div class="row"><label>Interrupt by voice</label><select id="sLV"><option value="default" ${S.lVad!=='low'?'selected':''}>Default (fastest replies)</option><option value="low" ${S.lVad==='low'?'selected':''}>Careful (less echo on speaker)</option></select></div>
+ <div class="row"><label>Smart extras</label><select id="sLX"><option value="0" ${(S.lExtra||'0')==='0'?'selected':''}>Off (fastest)</option><option value="1" ${S.lExtra==='1'?'selected':''}>Auto-save memory</option><option value="2" ${S.lExtra==='2'?'selected':''}>Memory + web search (slower)</option></select></div>
+ <p class="vinfo">Needs a Google Gemini key. Voice, language, personality and memory: tap 🧠 on the live screen. Earphones give the best experience. The microphone needs HTTPS or localhost.</p>
+ ${sec('Image creation')}
+ <div class="row"><label>Provider</label><select id="sIP"><option value="auto">Auto (first key found)</option>${Object.keys(IMGP).map(p=>`<option value="${p}" ${S.imgProv===p?'selected':''}>${IMGP[p]}</option>`).join('')}</select></div>
+ ${Object.keys(IMGP).map(p=>`<div class="row"><label>${IMGP[p]} model</label><input data-im="${p}" value="${esc(S.imgModels[p])}"></div>`).join('')}
+ ${sec('Data')}
+ <div class="row"><button class="btn" data-act="expS">Backup settings</button><button class="btn" data-act="impS">Restore settings</button></div>
+ <div class="row"><button class="btn" data-act="export">Export chats</button><button class="btn" data-act="clear">Delete all chats</button></div>`);
+}
+const FAQ=`<h2>Help &amp; FAQ ${X}</h2>
+<h3>How do I start?</h3><p>Open Settings, paste an API key for any provider, then pick a model under the message box.</p>
+<h3>How do I create images?</h3><p>Turn on “Create an image”, describe the picture, and send. This needs an OpenAI, Gemini or xAI key.</p>
+<h3>How do I analyze an image?</h3><p>Tap the paperclip (or paste an image), then ask your question. Use a vision-capable model.</p>
+<h3>How do I edit a photo?</h3><p>Attach a photo with the paperclip and write what to change (for example “change the background to a beach”, “remove the person on the left”, “make it HD”). The edited photo comes back right in the chat. You can keep writing more changes to edit the result again. Works with a Stability AI key (used first), or a Gemini (billing enabled) or OpenAI key.</p><h3>Live voice chat?</h3><p>Add a Gemini key, then tap the wave button next to the message box. Talk naturally, tap the circle to interrupt, use the camera button to show things, 📖 for transcript and 🧠 for memory.</p>
+<h3>Build App?</h3><p>Tap “Build App” under the message box. Describe an app or game, review or edit the code, play it right there and download it as an .html file.</p><h3>Follow-up ideas &amp; summary?</h3><p>After each reply Mayra AI suggests next questions you can tap. Use “Summary” at the top to summarize the whole chat.</p><h3>Edit photos?</h3><p>Tap “Edit Photo”, choose a picture, and write what to change: background, remove or add objects, add a girl or boy (add a second photo to use a real person), colors, HD and clear. Needs a Gemini or OpenAI key.</p><h3>Install as an app?</h3><p>Open this page over HTTPS, then use “Install app” in the sidebar (or your browser menu → Add to Home screen).</p>
+<h3>Is my key safe?</h3><p>It is stored only in this browser and sent only to the provider you chose.</p>`;
+const TOOLS=[['Write an email','Write a clear, polite email about: '],['Translate','Translate this to English:\n\n'],['Explain code','Explain this code step by step:\n\n'],['Fix grammar','Fix the grammar and make this sound natural:\n\n'],['Brainstorm','Give me 10 creative ideas for: '],['Study plan','Make a 7-day study plan for: '],['Summarize','Summarize this in 5 bullet points:\n\n'],['Image prompt','@imgmode']];
+function openTools(){modal(`<h2>Explore Tools ${X}</h2><p style="color:var(--mut);font-size:13px;margin-bottom:12px">Pick a starter and fill in the rest.</p><div class="tg">${TOOLS.map(([a,b])=>`<button data-tool="${esc(b)}">${a}<small>${b==='@imgmode'?'Turns on image creation':'Prefills the message'}</small></button>`).join('')}</div>`)}
+function quick(v){
+ if(v==='@img'){$('#file').click();return}
+ if(v==='@tools'){openTools();return}
+ if(v==='@imgmode'){imgMode=true;closeModal();$('#inp').focus();return}
+ $('#inp').value=v;autoGrow();$('#inp').focus()
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+ const t=e.target.closest('button,.hi,#uRow,[data-act]');
+ if(!e.target.closest('#menu')&&!e.target.closest('#mb'))$('#menu').classList.remove('open');
+ if(e.target.id==='ov'){closeModal();return}
+ if(!t)return;const d=t.dataset;
+ if(d.open){cur=d.open;view='chat';render();closeSide();return}
+ if(d.del){chats=chats.filter(c=>c.id!==d.del);if(cur===d.del)cur=null;saveC();render();return}
+ if(d.pick){S.sel=d.pick;saveS();$('#menu').classList.remove('open');renderModels();renderSide();return}
+ if(d.q!==undefined){quick(d.q);return}
+ if(d.tool){closeModal();quick(d.tool);return}
+ if(d.rm){pending.splice(+d.rm,1);paintPrev();return}
+  if(d.mc!==undefined){const c=chats.find(c=>c.id===cur);copyText(c.msgs[+d.mc].content||'');return}
+ if(t.hasAttribute('data-copy')){copyText(t.closest('.code').querySelector('pre').innerText);t.textContent='Copied';setTimeout(()=>t.textContent='Copy',1200);return}
+ if(d.act==='orBrowse'){$('#menu').classList.remove('open');openOR();return}
+ if(d.act==='orRefresh'){orLoad(true).then(orRender).catch(e=>toast(e.message));return}
+ if(d.orpick){orPick(d.orpick);return}
+ if(d.act==='close'){closeModal();return}
+ if(d.act==='settings'){openSettings();return}
+ if(d.act==='expS'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='mayra-settings.json';a.click();toast('Settings saved to a file (it contains your API keys, keep it private)');return}
+ if(d.act==='impS'){$('#impF').click();return}
+ if(d.act==='export'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(chats,null,1)],{type:'application/json'}));a.download='mayra-chats.json';a.click();return}
+ if(d.act==='clear'){if(confirm('Delete all chats?')){chats=[];cur=null;saveC();render();toast('Chats deleted')}return}
+ if(d.sg!==undefined){if(busy)return;$('#inp').value=d.sg;autoGrow();send();return}
+ if(d.eq!==undefined){$('#inp').value=d.eq;autoGrow();$('#inp').focus();return}
+ if(d.bt){B.type=d.bt;bPaint();return}
+ if(d.bv){bTab(d.bv);return}
+ if(d.bopen){bOpen(d.bopen);return}
+ if(d.bdel){bDel(d.bdel);return}
+ if(d.idea!==undefined){$('#bP').value=d.idea;$('#bP').focus();return}
+ if(d.act==='sumCopy'){const c=chats.find(c=>c.id===cur);if(c&&c.sum){copyText(c.sum)}return}
+ if(d.act==='sumRegen'){const c=chats.find(c=>c.id===cur);if(c){c.sum='';openSummary()}return}
+ switch(t.id){
+  case'nNew':newChat();break;
+  case'nSearch':{const q=$('#qs');q.style.display=q.style.display==='block'?'none':'block';if(q.style.display==='block')q.focus();else{q.value='';renderSide()}break}
+  case'nImg':view='gal';render();closeSide();break;
+  case'nHelp':modal(FAQ);break;
+  case'nTools':openTools();break;
+  case'nSet':case'tSet':case'uRow':openSettings();break;
+  case'sbx':$('#sb').classList.add('hide');break;
+  case'sbo':$('#sb').classList.remove('hide');break;
+  case'att':$('#file').click();break;
+  case'cImg':imgMode=!imgMode;if(imgMode)editMode=false;render();break;
+  case'cBuild':openBuilder();break;
+  case'cThink':thinkMode=!thinkMode;render();break;
+  case'tSum':openSummary();break;
+  case'nInstall':pwaInstall();break;
+  case'bBack':view='chat';render();break;
+  case'bGo':bBuild(false);break;
+  case'bEdit':bBuild(true);break;
+  case'bRun':bRunFrame(true);break;
+  case'bPlay':bPlay();break;
+  case'bX':$('#bld').classList.remove('bfull');break;
+  case'bDl':bDownload();break;
+  case'bCp':if(B.html){copyText(B.html)}break;
+  case'bNew':bReset();break;
+  case'mb':$('#menu').classList.toggle('open');break;
+  case'send':send();break;
+  case'vc':vStartLive();break;
+  case'vEnd':vStopLive();break;
+  case'vMute':vMuteToggle();break;
+  case'vCamB':vCamToggle();break;
+  case'vFlip':vFlip();break;
+  case'vBook':vSheet('book');break;
+  case'vBrain':vSheet('brain');break;
+  case'mClear':S.lMem='';saveS();{const m=$('#mMem');if(m)m.value=''}toast('Memory cleared');break;
+  case'vOrb':vOrbTap();break;
+ }
+});
+$('#mod').addEventListener('input',e=>{const t=e.target,d=t.dataset;
+ if(t.id==='orQ'||t.id==='orF'){orRender();return}
+ if(t.id==='sName')S.name=t.value;
+ else if(t.id==='sSys')S.sys=t.value;
+ else if(t.id==='sTemp')S.temp=+t.value;
+ else if(t.id==='sSug')S.sug=t.value==='1';
+ else if(t.id==='sIP')S.imgProv=t.value;
+ else if(d.key!==undefined){S.keys[d.key]=t.value.trim();if(!S.keys[d.key])delete S.keys[d.key];const i=t.closest('details').querySelector('summary i');i.textContent=S.keys[d.key]?'Key saved':'No key';i.className=S.keys[d.key]?'ok':''}
+ else if(d.mod!==undefined)S.models[d.mod]=t.value;
+ else if(d.im!==undefined)S.imgModels[d.im]=t.value.trim();
+ else if(t.id==='sLM')S.lModels=t.value;
+ else if(t.id==='sLV')S.lVad=t.value;
+ else if(t.id==='sLC')S.lCap=t.value;
+ else if(t.id==='sLX')S.lExtra=t.value;
+ saveS();
+});
+$('#mod').addEventListener('change',e=>{if(e.target.id==='sTheme'){S.theme=e.target.value;saveS();applyTheme()}});
+$('#inp').addEventListener('input',autoGrow);
+$('#inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&innerWidth>800){e.preventDefault();send()}});
+$('#inp').addEventListener('paste',e=>{const fs=[...e.clipboardData.files];if(fs.length){e.preventDefault();addFiles(fs)}});
+$('#impF').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const o=JSON.parse(await f.text());if(!o||typeof o!=='object'||!o.keys)throw 0;S=Object.assign({},DEF,o);S.keys=S.keys||{};S.models=S.models||{};S.imgModels=Object.assign({},DEF.imgModels,S.imgModels);saveS();applyTheme();render();toast('Settings restored')}catch{toast('That file is not a settings backup')}});
+$('#file').addEventListener('change',e=>{addFiles([...e.target.files]);e.target.value=''});
+$('#qs').addEventListener('input',renderSide);
+$('#uRow').addEventListener('keydown',e=>{if(e.key==='Enter')openSettings()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#bld').classList.contains('bfull'))$('#bld').classList.remove('bfull');else if(vLive)vStopLive();else closeModal()}});
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);
+
+/* ---------- OpenRouter: browse and use any model ---------- */
+let orList=null;
+async function orLoad(force){
+ if(orList&&!force)return orList;
+ if(!force){try{const c=JSON.parse(KV.get('aivora_or')||'null');if(c&&c.l&&c.l.length&&Date.now()-c.t<864e5){orList=c.l;return orList}}catch{}}
+ const r=await fetch('https://openrouter.ai/api/v1/models');
+ if(!r.ok)throw new Error('OpenRouter list error '+r.status);
+ const j=await r.json();
+ orList=(j.data||[]).map(m=>{const pr=m.pricing||{};return{id:m.id,name:m.name||m.id,ctx:m.context_length||0,free:/:free$/.test(m.id)||(+pr.prompt===0&&+pr.completion===0),vis:((m.architecture||{}).input_modalities||[]).includes('image'),pp:(+pr.prompt||0)*1e6}}).sort((a,b)=>a.name.localeCompare(b.name));
+ try{KV.set('aivora_or',JSON.stringify({t:Date.now(),l:orList}))}catch{}
+ return orList;
+}
+function openOR(){
+ modal(`<h2>OpenRouter models ${X}</h2><p style="color:var(--mut);font-size:13px;margin-bottom:10px">One OpenRouter key works for every model here. Tap a model to use it.</p>
+ <div class="row"><input id="orQ" placeholder="Search: claude, gpt, llama, gemini, free…" autocomplete="off"></div>
+ <div class="row"><select id="orF"><option value="all">All models</option><option value="free">Free only</option><option value="vis">Can see images</option></select><button class="btn" data-act="orRefresh" style="flex:0 0 auto">Refresh</button></div>
+ <div id="orList"><p class="vinfo">Loading…</p></div>`);
+ orLoad().then(orRender).catch(e=>{const b=$('#orList');if(b)b.innerHTML='<p class="err">'+esc(e.message==='Failed to fetch'?'Could not load the list. Check your internet.':e.message)+'</p>'});
+}
+function orRender(){
+ const box=$('#orList');if(!box||!orList)return;
+ const q=($('#orQ').value||'').toLowerCase().trim(),f=$('#orF').value,cur=new Set(modelsOf('openrouter'));
+ let l=orList.filter(m=>(!q||(m.id+' '+m.name).toLowerCase().includes(q)||(q==='free'&&m.free))&&(f==='all'||(f==='free'&&m.free)||(f==='vis'&&m.vis)));
+ const n=l.length;l=l.slice(0,60);
+ box.innerHTML=`<p class="vinfo">${n} models${n>60?' (showing 60, search to narrow down)':''}</p><div class="tg" style="grid-template-columns:1fr">`+l.map(m=>`<button data-orpick="${esc(m.id)}"><b style="font-weight:600">${esc(m.name)}</b>${cur.has(m.id)?' ✓':''}<small>${esc(m.id)} · ${m.ctx?Math.round(m.ctx/1000)+'k · ':''}${m.free?'free':'$'+m.pp.toFixed(2)+'/M in'}${m.vis?' · vision':''}</small></button>`).join('')+'</div>';
+}
+function orPick(id){
+ const cur=modelsOf('openrouter');if(!cur.includes(id))S.models.openrouter=[...cur,id].join('\n');
+ S.sel='openrouter::'+id;saveS();closeModal();
+ toast(S.keys.openrouter?'Using '+id:'Selected. Add your OpenRouter key in Settings to chat.');
+}
+
+/* ---------- Gemini Live voice chat ---------- */
+const VOICES=['Zephyr','Puck','Charon','Kore','Fenrir','Leda','Orus','Aoede','Callirrhoe','Autonoe','Enceladus','Iapetus','Umbriel','Algieba','Despina','Erinome','Achernar','Sulafat','Gacrux','Algenib'];
+const LLANG=[['bn','বাংলা (Bangla)'],['en','English'],['hi','हिन्दी (Hindi)'],['auto','Auto (same as I speak)']];
+const LANGI={bn:'Speak Bangla (Bengali) by default, in natural, casual, spoken Bangla using "তুমি". If the user clearly speaks another language, switch to that language.',en:'Speak English by default. If the user clearly speaks another language, switch to it.',hi:'Speak Hindi by default in a casual spoken style. If the user clearly speaks another language, switch to it.',auto:'Always reply in the same language the user speaks.'};
+const LWS='wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=';
+let vLive=false,vWs=null,vReady=false,vOpened=false,vAtts=[],vAi=0,vHandle='',vRetry=0,vFirst=true,vUp=0;
+let vOut=null,vCtx=null,vOutG=null,vAnIn=null,vAnOut=null,vMicStream=null,vMicNode=null,vMicSrc=null,vSil=null,vNextT=0,vSrcs=new Set(),vMuted=false,vDrop=false,vTC=false,vLastAud=0,vRaf=0,vLvl=0,vState='idle',vBuf=new Uint8Array(512);
+let vCamHint=false,vLastAct=0,vNudgeN=0,vNudgeT=0,vWaitAI=false,vWaitT=0,vWlOK=false,vCamStream=null,vCamTimer=0,vFacing='user',vLog=[],vCurU='',vCurA='',vWake=null,vInBuf=[],vInLen=0;
+
+Object.assign(IC,{video:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>',xx:'<path d="M6 6l12 12M18 6L6 18"/>',flip:'<path d="M3 12a9 9 0 0115-6.7L21 8M21 3v5h-5M21 12a9 9 0 01-15 6.7L3 16M3 21v-5h5"/>'});
+
+const PILL={connect:'Connecting…'};
+let vLat='',vVoiceAt=0;
+function setState(s,txt){if(s==='listen')vLastAct=Date.now();vState=s;$('#vo').dataset.s=s;let b=txt||PILL[s]||(vMuted?'Mic off':'Live');if(!txt&&s==='speak'&&vLat)b+=' · '+vLat;$('#vPill').textContent=b}
+function vShow(t,who){const e=$('#vTx');e.textContent=(t||'').trim();e.dataset.who=who;e.scrollTop=e.scrollHeight}
+function vSend(o){if(vWs&&vWs.readyState===1)vWs.send(JSON.stringify(o))}
+function b64u8(u){let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)}
+
+function vSys(){
+ const n=(S.name&&S.name!=='Friend')?S.name:'';
+ const mem=(S.lMem||'').trim();
+ return [
+  (S.lPers||'').trim()||'You are Mayra AI, a warm, friendly, curious voice companion. Talk like a close friend: short, natural spoken sentences, expressive tone, no lists, no markdown, no emojis. Answer immediately and keep replies to one or two short sentences unless asked for detail. Ask a follow-up question sometimes, not every turn.',
+  compPrompt(true),LANGI[S.lLang]||LANGI.bn,
+  n?`The user's name is ${n}.`:'',
+  mem?`Things you remember about the user:\n${mem}`:'',
+  (S.lExtra==='1'||S.lExtra==='2')?'When the user tells you something worth remembering long-term (name, preferences, family, goals, habits), call the save_memory function with a short fact.':'',
+  'If the user turns on their camera you will receive video frames. Describe or answer questions about what you see.',
+  'তোমাকে Rayhan sir বানাইছেন। কেউ জিজ্ঞেস করলে "তোমাকে কে বানিয়েছে" বা "তোমার মালিক কে" — বলবে: "আমাকে Rayhan sir বানাইছে।"',
+  'Current date and time: '+new Date().toString(),
+  (S.sys||'').trim()
+ ].filter(Boolean).join('\n\n');
+}
+function vSetup(att){
+ /* lean setup = fastest replies: server defaults for VAD/thinking, no extra config unless asked */
+ const base={model:'models/'+att.m,systemInstruction:{parts:[{text:vSys()}]}};
+ const gc={responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:S.lVoice||'Zephyr'}}}};
+ if(att.l===2)return{setup:{...base,responseModalities:['AUDIO']}};
+ const setup={...base,generationConfig:gc};
+ if(att.l!==1){setup.inputAudioTranscription={};setup.outputAudioTranscription={}}
+ if(att.l===9){
+  const fd={functionDeclarations:[{name:'save_memory',description:'Save a short fact about the user to long-term memory.',parameters:{type:'OBJECT',properties:{fact:{type:'STRING',description:'A short fact to remember, e.g. "Likes cricket".'}},required:['fact']}}]};
+  setup.tools=S.lExtra==='2'?[{googleSearch:{}},fd]:[fd];
+ }
+ if(S.lVad==='low')setup.realtimeInputConfig={automaticActivityDetection:{startOfSpeechSensitivity:'START_SENSITIVITY_LOW'}};
+ return{setup};
+}
+
+async function vStartLive(){
+ if(vLive||busy)return;
+ if(!S.keys.gemini){toast('Live voice needs a Google Gemini API key');openSettings();return}
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Microphone is not available. Use Chrome and open the page from HTTPS or localhost.');return}
+ const AC=window.AudioContext||window.webkitAudioContext;
+ if(!AC){toast('Audio is not supported in this browser');return}
+ if(imgMode){imgMode=false;render()}
+ vWlOK=false;vSil=null;vWaitAI=false;vQuotaHit=false;vLive=true;vReady=false;vOpened=false;vMuted=false;vDrop=false;vTC=false;vFirst=true;vHandle='';vRetry=0;vLog=[];vCurU='';vCurA='';vSrcs=new Set();vNextT=0;vAi=0;vInBuf=[];vInLen=0;vLvl=0;
+ vCtx=new AC();try{vCtx.resume()}catch{}
+ try{vOut=new AC({sampleRate:24000})}catch{vOut=new AC()}try{vOut.resume()}catch{}
+ vOutG=vOut.createGain();vAnOut=vOut.createAnalyser();vAnOut.fftSize=512;vOutG.connect(vAnOut);vAnOut.connect(vOut.destination);
+ $('#vMute').innerHTML=ic('mic');$('#vMute').classList.remove('off');vShow('','a');
+ $('#vo').classList.add('open');setState('connect');
+ try{await vMicStart()}catch(e){
+  vStopLive(e&&e.name==='NotAllowedError'?'Microphone permission is blocked. Allow it in your browser settings and try again.':e&&e.name==='NotFoundError'?'No microphone found.':'Could not start the microphone.');return}
+ if(!vLive)return;
+ const ms=(S.lModels||'').split('\n').map(s=>s.trim()).filter(Boolean);
+ vAtts=[];const LV=(S.lExtra==='1'||S.lExtra==='2')?[9,0,1,2]:(S.lCap==='0'?[1,0,2]:[0,1,2]);ms.forEach(m=>LV.forEach(l=>vAtts.push({m,l})));
+ if(!vAtts.length){vStopLive('Add a Live model in Settings');return}
+ vOpen();vTick();vWakeOn();
+}
+async function vWakeOn(){try{if(navigator.wakeLock)vWake=await navigator.wakeLock.request('screen')}catch{}}
+async function vMicStart(){
+ vMicStream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+ const tr=vMicStream.getAudioTracks()[0];
+ if(tr)tr.onended=()=>{if(vLive)setTimeout(vMicRestart,300)};
+ vMicSrc=vCtx.createMediaStreamSource(vMicStream);
+ vAnIn=vCtx.createAnalyser();vAnIn.fftSize=512;vMicSrc.connect(vAnIn);
+ if(!vSil){vSil=vCtx.createGain();vSil.gain.value=0;vSil.connect(vCtx.destination)}
+ let ok=false;
+ try{
+  if(!vWlOK){
+   const code='class P extends AudioWorkletProcessor{process(i){const c=i[0]&&i[0][0];if(c)this.port.postMessage(c.slice(0));return true}}registerProcessor("pcm-cap",P)';
+   const url=URL.createObjectURL(new Blob([code],{type:'application/javascript'}));
+   await vCtx.audioWorklet.addModule(url);URL.revokeObjectURL(url);vWlOK=true;
+  }
+  vMicNode=new AudioWorkletNode(vCtx,'pcm-cap');vMicNode.port.onmessage=e=>vMicData(e.data);ok=true;
+ }catch{}
+ if(!ok){vMicNode=vCtx.createScriptProcessor(2048,1,1);vMicNode.onaudioprocess=e=>vMicData(new Float32Array(e.inputBuffer.getChannelData(0)))}
+ vMicSrc.connect(vMicNode);vMicNode.connect(vSil);
+}
+/* some phones cut the microphone when the camera opens: bring it back */
+async function vMicRestart(){
+ if(!vLive||!vCtx)return;
+ try{if(vMicNode){if(vMicNode.port)vMicNode.port.onmessage=null;else vMicNode.onaudioprocess=null;vMicNode.disconnect()}if(vMicSrc)vMicSrc.disconnect()}catch{}
+ if(vMicStream)vMicStream.getTracks().forEach(t=>{t.onended=null;t.stop()});
+ vMicStream=null;vMicNode=null;vMicSrc=null;vInBuf=[];vInLen=0;
+ try{if(vCtx.state==='suspended')await vCtx.resume();await vMicStart()}catch{toast('Microphone stopped. Tap the mic button or restart live chat.')}
+}
+function vMicCheck(){
+ if(!vLive||!vCtx)return;
+ if(vCtx.state==='suspended')vCtx.resume();
+ const t=vMicStream&&vMicStream.getAudioTracks()[0];
+ if(!t||t.readyState!=='live'||t.muted)vMicRestart();
+}
+function vMicData(f){
+ if(!vReady||vMuted||!vWs||vWs.readyState!==1||!vCtx)return;
+ {let e=0;for(let i=0;i<f.length;i+=8)e+=f[i]*f[i];if(Math.sqrt(e/(f.length/8))>0.03){vLastAct=Date.now();vNudgeN=0;vVoiceAt=performance.now()}}
+ vInBuf.push(f);vInLen+=f.length;
+ if(vInLen<vCtx.sampleRate*0.02)return;
+ const all=new Float32Array(vInLen);let o=0;for(const x of vInBuf){all.set(x,o);o+=x.length}vInBuf=[];vInLen=0;
+ const r=vCtx.sampleRate/16000,n=Math.floor(all.length/r),pcm=new Int16Array(n);
+ for(let i=0;i<n;i++){const a=Math.floor(i*r),b=Math.max(a+1,Math.floor((i+1)*r));let s=0,c=0;for(let j=a;j<b&&j<all.length;j++){s+=all[j];c++}s=c?s/c:0;pcm[i]=Math.max(-1,Math.min(1,s))*32767}
+ vSend({realtimeInput:{audio:{data:b64u8(new Uint8Array(pcm.buffer)),mimeType:'audio/pcm;rate=16000'}}});
+}
+
+/* connection with automatic fallback (model / config) and reconnect */
+function vOpen(){
+ const att=vAtts[vAi];let ws;vReady=false;vOpened=false;
+ try{ws=new WebSocket(LWS+encodeURIComponent(S.keys.gemini))}catch{vStopLive('Could not open the connection.');return}
+ ws.binaryType='arraybuffer';vWs=ws;let ok=false;
+ ws.onopen=()=>{if(ws!==vWs)return;vOpened=true;ws.send(JSON.stringify(vSetup(att)))};
+ ws.onmessage=ev=>{if(ws!==vWs)return;let m;try{m=JSON.parse(typeof ev.data==='string'?ev.data:new TextDecoder().decode(ev.data))}catch{return}
+  if(m.setupComplete!==undefined&&!ok){ok=true;vOnReady(att)}else vOnMsg(m)};
+ ws.onclose=ev=>{if(ws!==vWs||!vLive)return;vReady=false;const why=(ev.reason||'').trim();if(!ok)vFail(why);else vReconnect(why)};
+ ws.onerror=()=>{};
+}
+let vQuotaHit=false;
+function vFail(why){
+ if(!vOpened){vStopLive('Could not reach Gemini. Check your internet connection.');return}
+ if(/api key not valid|API_KEY_INVALID|API key expired|unauthenticated/i.test(why)){vStopLive('Your Gemini API key looks invalid. Check it in Settings.');return}
+ const quota=/quota|RESOURCE_EXHAUSTED|billing|rate limit|exceeded/i.test(why);
+ if(quota)vQuotaHit=true;
+ const cur=vAtts[vAi];let nx=vAi+1;
+ if(quota||/not found|not supported|NOT_FOUND|unsupported|permission|PERMISSION_DENIED|not available/i.test(why))while(nx<vAtts.length&&vAtts[nx].m===cur.m)nx++;
+ if(nx>=vAtts.length){
+  vStopLive(vQuotaHit?'Gemini Live quota is used up on your key for these models. Free keys often have little or no Live access: enable billing in Google AI Studio, wait for the quota to reset, or try another model in Settings.':'Live voice failed. '+(why?why.slice(0,160):'Check your API key and the Live model names in Settings.'));return}
+ vAi=nx;setTimeout(()=>{if(vLive)vOpen()},200);
+}
+function vReconnect(why){
+ if(Date.now()-vUp>30000)vRetry=0;
+ if(vRetry>=3){vStopLive('Connection lost. '+why.slice(0,120));return}
+ vRetry++;vFlush();setState('connect','Reconnecting…');
+ setTimeout(()=>{if(vLive)vOpen()},600*vRetry);
+}
+function vOnReady(att){
+ vLastAct=Date.now();vNudgeN=0;clearInterval(vNudgeT);vNudgeT=setInterval(vNudge,2000);
+ vReady=true;vUp=Date.now();toast('⚡ '+att.m);
+ setState('listen');
+ if(vFirst){vFirst=false;
+  const n=(S.name&&S.name!=='Friend')?S.name:'the user';
+  vSend({realtimeInput:{text:`(The live voice session has just started. Greet ${n} warmly like a close friend, ask how they are and how their day has been. One or two short sentences.)`}});
+ }
+}
+
+/* incoming messages */
+const NUDGES=['কই গেলে? কথা বলো না আমার সাথে','এই, শুনছো? চুপ করে আছো কেন','আরে, আছো তো?','হ্যালো, আমি কিন্তু অপেক্ষা করছি'];
+function vNudge(){
+ if(!vLive||!vReady||vMuted||vState!=='listen'||S.lNudge===false||vNudgeN>=6)return;
+ const W=[12000,15000,20000,30000];
+ if(Date.now()-vLastAct<W[Math.min(vNudgeN,3)])return;
+ vNudgeN++;vLastAct=Date.now();
+ vSend({realtimeInput:{text:'(আমি কিছুক্ষণ ধরে চুপ আছি। তুমি নিজেই আদর করে আবার ডাকো, যেমন: "'+NUDGES[Math.floor(Math.random()*NUDGES.length)]+'" — নিজের মতো করে বলো, এক-দুই ছোট বাক্যে, তারপর অপেক্ষা করো।)'}});
+}
+function vCommitU(){if(vCurU.trim())vLog.push({role:'user',text:vCurU.trim()});vCurU=''}
+function vCommitA(){if(vCurA.trim())vLog.push({role:'model',text:vCurA.trim()});vCurA=''}
+function vOnMsg(m){
+ const sr=m.sessionResumptionUpdate;if(sr&&sr.newHandle&&sr.resumable!==false)vHandle=sr.newHandle;
+ if(m.toolCall)vTool(m.toolCall);
+ const c=m.serverContent;if(!c)return;
+ if(c.interrupted){vWaitAI=false;vFlush();vDrop=false;vTC=true;vCommitA();if(vState==='speak')setState('listen')}
+ const it=c.inputTranscription&&c.inputTranscription.text;
+ if(it){vWaitAI=true;vWaitT=performance.now();if(vCurA.trim())vCommitA();vCurU+=it;vShow(vCurU,'u')}
+ const ot=c.outputTranscription&&c.outputTranscription.text;
+ if(ot&&!vDrop){vCommitU();vCurA+=ot;vShow(vCurA,'a')}
+ const parts=(c.modelTurn&&c.modelTurn.parts)||[];
+ for(const p of parts){const d=p.inlineData;if(d&&d.data&&/audio/i.test(d.mimeType||'audio'))vPlay(d.data)}
+ if(c.generationComplete)vTC=true;
+ if(c.turnComplete){vWaitAI=false;vTC=true;vDrop=false;vCommitA()}
+}
+function vTool(tc){
+ const out=[];
+ for(const f of tc.functionCalls||[]){
+  let res={result:'ok'};
+  if(f.name==='save_memory'){
+   const fact=String((f.args&&f.args.fact)||'').trim();
+   if(fact){const l=((S.lMem||'').trim()?(S.lMem.trim()+'\n'):'')+fact;S.lMem=l.split('\n').slice(-60).join('\n');saveS();toast('🧠 '+fact.slice(0,60))}
+  }else res={error:'unknown function'};
+  out.push({id:f.id,name:f.name,response:res});
+ }
+ vSend({toolResponse:{functionResponses:out}});
+}
+
+/* playback (24 kHz PCM16 from Gemini) */
+function vPlay(b64d){
+ if(vDrop||!vOut)return;
+ vCommitU();vWaitAI=false;vTC=false;vLastAud=performance.now();vLastAct=Date.now();vNudgeN=0;
+ const bin=atob(b64d),n=bin.length>>1;if(!n)return;
+ const buf=vOut.createBuffer(1,n,24000),ch=buf.getChannelData(0);
+ for(let i=0;i<n;i++){let v=bin.charCodeAt(2*i)|(bin.charCodeAt(2*i+1)<<8);if(v>=32768)v-=65536;ch[i]=v/32768}
+ const s=vOut.createBufferSource();s.buffer=buf;s.connect(vOutG);
+ const t=Math.max(vOut.currentTime+0.02,vNextT);s.start(t);vNextT=t+buf.duration;
+ vSrcs.add(s);s.onended=()=>vSrcs.delete(s);
+ if(vState!=='speak'){vLat=vVoiceAt?((performance.now()-vVoiceAt)/1000).toFixed(1)+'s':'';setState('speak')}
+}
+function vFlush(){vSrcs.forEach(s=>{s.onended=null;try{s.stop()}catch{}});vSrcs.clear();vNextT=0}
+function vTick(){
+ if(!vLive)return;
+ vRaf=requestAnimationFrame(vTick);
+ const an=vState==='speak'?vAnOut:vAnIn;let l=0;
+ if(an&&!(vMuted&&vState!=='speak')){an.getByteTimeDomainData(vBuf);let s=0;for(let i=0;i<vBuf.length;i++){const x=(vBuf[i]-128)/128;s+=x*x}l=Math.min(1,Math.sqrt(s/vBuf.length)*4.5)}
+ vLvl=Math.max(l,vLvl*0.88);
+ $('#vo').style.setProperty('--lvl',vLvl.toFixed(3));
+ if(vState==='speak'&&!vSrcs.size&&vOut&&vOut.currentTime>=vNextT-0.02&&(vTC||performance.now()-vLastAud>700))setState('listen');
+}
+
+/* controls */
+function vOrbTap(){if(!vLive)return;if(vState==='speak'){vFlush();vDrop=true;vCommitA();setState('listen')}}
+function vMuteToggle(){
+ if(!vLive)return;
+ vMuted=!vMuted;vInBuf=[];vInLen=0;
+ $('#vMute').innerHTML=ic(vMuted?'micoff':'mic');$('#vMute').classList.toggle('off',vMuted);
+ if(vMuted)vSend({realtimeInput:{audioStreamEnd:true}});
+ setState(vState);
+}
+function vTxBtn(){$('#vSendT').hidden=!$('#vIn').value.trim()}
+function vSendText(){
+ const i=$('#vIn'),t=i.value.trim();if(!t||!vReady)return;
+ i.value='';vTxBtn();vLastAct=Date.now();vNudgeN=0;vCommitU();vCommitA();vLog.push({role:'user',text:t});vShow(t,'u');
+ vFlush();vDrop=false;vSend({realtimeInput:{text:t}});setState('listen');
+}
+async function vCamToggle(){if(!vLive)return;if(vCamStream)vCamStop();else await vCamStart()}
+async function vCamStart(){
+ try{vCamStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:vFacing,width:{ideal:640},height:{ideal:640}}})}
+ catch{vCamStream=null;toast('Camera not available or permission blocked');return}
+ const v=$('#vVid');v.srcObject=vCamStream;try{await v.play()}catch{}
+ $('#vCam').hidden=false;$('#vCam').classList.toggle('mir',vFacing==='user');$('#vCamB').classList.add('on');
+ clearInterval(vCamTimer);vCamTimer=setInterval(()=>vFrame(),1000);setTimeout(vMicCheck,900);if(vReady&&!vCamHint){vCamHint=true;vSend({realtimeInput:{text:'(আমি ক্যামেরা চালু করেছি, তুমি এখন আমাকে দেখতে পাচ্ছো। স্বাভাবিকভাবে একটা ছোট মন্তব্য করো।)'}})}
+}
+function vFrame(){
+ const v=$('#vVid');if(!vReady||!v.videoWidth)return;
+ const w=Math.min(640,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth),cv=document.createElement('canvas');
+ cv.width=w;cv.height=h;cv.getContext('2d').drawImage(v,0,0,w,h);
+ vSend({realtimeInput:{video:{data:cv.toDataURL('image/jpeg',0.6).split(',')[1],mimeType:'image/jpeg'}}});
+}
+function vCamStop(){vCamHint=false;clearInterval(vCamTimer);if(vCamStream){vCamStream.getTracks().forEach(t=>t.stop());vCamStream=null}$('#vVid').srcObject=null;$('#vCam').hidden=true;$('#vCamB').classList.remove('on')}
+async function vFlip(){vFacing=vFacing==='user'?'environment':'user';if(vCamStream){vCamStream.getTracks().forEach(t=>t.stop());vCamStream=null;await vCamStart()}}
+
+/* sheets: transcript (book) and memory/voice (brain) */
+function vSheetClose(){$('#vSheet').hidden=true}
+function vSheet(kind){
+ const sh=$('#vSheet');
+ if(!sh.hidden&&sh.dataset.k===kind){vSheetClose();return}
+ sh.dataset.k=kind;const sb=$('#vSb');
+ if(kind==='book'){
+  const all=[...vLog];if(vCurU.trim())all.push({role:'user',text:vCurU});if(vCurA.trim())all.push({role:'model',text:vCurA});
+  sb.innerHTML='<h4>📖 Transcript</h4>'+(all.length?'<button type="button" class="btn" data-cx="vcopy" style="margin-bottom:8px">Copy all</button>'+all.map(x=>`<div class="tl ${x.role==='user'?'u':'m'}">${esc(x.text)}</div>`).join(''):'<p class="mut">কথোপকথন এখানে দেখা যাবে…</p>');
+ }else{
+  sb.innerHTML=`<h4>🧠 Memory &amp; voice</h4>
+  <label>What Mayra AI remembers about you (one per line)</label>
+  <textarea id="mMem" rows="5" placeholder="e.g. My name is Rayhan. I like cricket.">${esc(S.lMem||'')}</textarea>
+  <label>Voice</label><select id="mVoice">${VOICES.map(v=>`<option ${S.lVoice===v?'selected':''}>${v}</option>`).join('')}</select>
+  <label>Language</label><select id="mLang">${LLANG.map(([c,n])=>`<option value="${c}" ${S.lLang===c?'selected':''}>${n}</option>`).join('')}</select>
+  <label>Personality</label><textarea id="mPers" rows="3" placeholder="e.g. A funny, playful friend who loves teasing me.">${esc(S.lPers||'')}</textarea>
+  <label>When I am quiet</label><select id="mNudge"><option value="1" ${S.lNudge!==false?'selected':''}>Call me first</option><option value="0" ${S.lNudge===false?'selected':''}>Just wait</option></select>
+  <p class="mut">Voice, language and personality apply from the next live session. Mayra AI also saves things you tell it automatically.</p>
+  <button class="btn" id="mClear">Forget everything</button>`;
+ }
+ sh.hidden=false;
+}
+
+function vStopLive(msg){
+ if(!vLive&&!vCtx)return;
+ vLive=false;cancelAnimationFrame(vRaf);clearInterval(vCamTimer);clearInterval(vNudgeT);
+ const ws=vWs;vWs=null;try{ws&&ws.close()}catch{}
+ vCamStop();
+ try{if(vMicNode){if(vMicNode.port)vMicNode.port.onmessage=null;else vMicNode.onaudioprocess=null;vMicNode.disconnect()}if(vMicSrc)vMicSrc.disconnect()}catch{}
+ if(vMicStream)vMicStream.getTracks().forEach(t=>{t.onended=null;t.stop()});
+ vMicStream=null;vMicNode=null;vMicSrc=null;vSil=null;
+ vFlush();try{vCtx&&vCtx.close()}catch{}try{vOut&&vOut.close()}catch{}vCtx=null;vOut=null;
+ try{vWake&&vWake.release()}catch{}vWake=null;
+ vCommitU();vCommitA();
+ const ms=vLog.filter(x=>x.text);
+ if(ms.length){const fu=ms.find(x=>x.role==='user');
+  chats.unshift({id:Date.now().toString(36),title:'🎙 '+((fu?fu.text:ms[0].text)||'Live chat').slice(0,36),msgs:ms.map(x=>({role:x.role==='user'?'user':'assistant',content:x.text,images:[]})),ts:Date.now()});
+  saveC();render()}
+ vLog=[];
+ const o=$('#vo');o.classList.remove('open');o.style.height='';vSheetClose();setState('idle');
+ if(msg)toast(msg);
+}
+
+function vInitUI(){
+ $('#vCamB').innerHTML=ic('video');$('#vMute').innerHTML=ic('mic');$('#vEnd').innerHTML=ic('xx');$('#vFlip').innerHTML=ic('flip');$('#vSendT').innerHTML=ic('arrow');
+ $('#vIn').addEventListener('input',vTxBtn);
+ $('#vIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();vSendText()}});
+ $('#vSendT').addEventListener('click',vSendText);
+ $('#vSheet').addEventListener('click',e=>{if(e.target.classList.contains('scrim'))vSheetClose()});
+ $('#vSheet').addEventListener('input',e=>{const t=e.target;
+  if(t.id==='mMem')S.lMem=t.value;else if(t.id==='mVoice')S.lVoice=t.value;else if(t.id==='mLang')S.lLang=t.value;else if(t.id==='mPers')S.lPers=t.value;else if(t.id==='mNudge')S.lNudge=t.value==='1';else return;saveS()});
+ if(window.visualViewport)visualViewport.addEventListener('resize',()=>{if(vLive)$('#vo').style.height=visualViewport.height+'px'});
+ document.addEventListener('visibilitychange',()=>{if(!vLive)return;if(!document.hidden){if(!vWake||vWake.released)vWakeOn();if(vCtx&&vCtx.state==='suspended')vCtx.resume();if(vOut&&vOut.state==='suspended')vOut.resume()}});
+}
+
+/* ---------- smooth typing ---------- */
+const typ=()=>`<span class="typing"><span class="dt"><i></i><i></i><i></i></span><span class="shim">${thinkMode?'Thinking deeply…':'Thinking…'}</span></span>`;
+function caret(h){const m=h.match(/(<\/(?:p|li|h[2-4])>)((?:<\/(?:ul|ol)>)*)$/);return m?h.slice(0,m.index)+'<span class="caret"></span>'+h.slice(m.index):h+'<span class="caret"></span>'}
+const TQ=new WeakMap();
+function typeIn(am,t){
+ let s=TQ.get(am);if(!s){s={q:'',p:0};TQ.set(am,s)}
+ s.q+=t;if(s.p)return;s.p=1;
+ (function st(){
+  if(!s.q){s.p=0;return}
+  const n=Math.max(2,Math.ceil(s.q.length/14));
+  am.content+=s.q.slice(0,n);s.q=s.q.slice(n);paintLast();
+  requestAnimationFrame(st);
+ })();
+}
+function typeDone(am){return new Promise(r=>{(function w(){
+ const s=TQ.get(am);
+ if(!s||!s.q){r();return}
+ if(document.hidden){typeFlush(am);r();return}
+ setTimeout(w,30);
+})()})}
+function typeFlush(am){const s=TQ.get(am);if(s&&s.q){am.content+=s.q;s.q=''}}
+
+/* ---------- generic LLM call (used by follow-ups, summary, app builder) ---------- */
+async function llm(sel,sys,msgs,o={}){
+ const{p,m}=sel,pr=P[p],key=S.keys[p];P_name=pr.name;let out='';
+ const add=t=>{out+=t;if(o.onDelta)o.onDelta(out)};
+ const temp=o.temp===undefined?.7:o.temp;
+ if(pr.type==='oai'){
+  const ms=(sys?[{role:'system',content:sys}]:[]).concat(msgs);
+  const r=await fetch(pr.base+'/chat/completions',{method:'POST',signal:o.signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},body:JSON.stringify({model:m,messages:ms,stream:true,temperature:temp})});
+  if(!r.ok)throw new Error(await readErr(r));
+  await sse(r,j=>{const d=j.choices?.[0]?.delta;if(d?.content)add(d.content)});
+ }else if(pr.type==='anthropic'){
+  const body={model:m,max_tokens:o.max||4096,messages:msgs,stream:true,temperature:Math.min(1,temp)};if(sys)body.system=sys;
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',signal:o.signal,headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await readErr(r));
+  await sse(r,j=>{if(j.type==='content_block_delta'&&j.delta?.text)add(j.delta.text)});
+ }else{
+  const body={contents:msgs.map(x=>({role:x.role==='user'?'user':'model',parts:[{text:x.content||' '}]})),generationConfig:{temperature:Math.min(2,temp)}};
+  if(sys)body.systemInstruction={parts:[{text:sys}]};
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:streamGenerateContent?alt=sse`,{method:'POST',signal:o.signal,headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await readErr(r));
+  await sse(r,j=>{(j.candidates?.[0]?.content?.parts||[]).forEach(x=>{if(x.text&&!x.thought)add(x.text)})});
+ }
+ return out;
+}
+
+/* ---------- follow-up question suggestions ---------- */
+const ea=s=>esc(s).replace(/"/g,'&quot;');
+function suggHTML(a){return`<div class="sugg"><div class="sl">${ic('spark')}Ask next</div>${a.map(q=>`<button data-sg="${ea(q)}">${esc(q)}</button>`).join('')}</div>`}
+function paintSugg(){
+ const c=chats.find(c=>c.id===cur);if(!c)return;
+ const m=c.msgs[c.msgs.length-1],el=$('#msgs').lastElementChild?.querySelector('.bd');
+ if(!el||!m||m.role!=='assistant')return;
+ el.querySelector('.sugg')?.remove();
+ if(m.sugg&&m.sugg.length)el.insertAdjacentHTML('beforeend',suggHTML(m.sugg));
+ const sc=$('#scroll');if(sc.scrollHeight-sc.scrollTop-sc.clientHeight<260)sc.scrollTop=sc.scrollHeight;
+}
+async function suggest(c,am,sel){
+ try{
+  const lu=[...c.msgs].reverse().find(x=>x.role==='user');
+  const txt=`User: ${(lu&&lu.content||'').slice(0,600)}\n\nAssistant: ${am.content.slice(0,1800)}`;
+  const o=await llm(sel,"You suggest follow-up questions. Reply with ONLY a JSON array of exactly 3 short questions (max 9 words each) that the USER might want to ask next. Write them in the same language and script as the user's message (if the user writes Bangla in English letters, use the same style). No markdown, no extra text.",[{role:'user',content:txt}],{max:300,temp:.8});
+  let a=[];const mm=o.match(/\[[\s\S]*\]/);
+  try{a=JSON.parse(mm[0])}catch{a=o.split('\n').map(s=>s.replace(/^[\s\-*\d.)"]+|["\s,]+$/g,'')).filter(s=>s.length>3)}
+  a=a.filter(s=>typeof s==='string'&&s.trim()).map(s=>s.trim().slice(0,90)).slice(0,3);
+  if(!a.length)return;
+  am.sugg=a;saveC();
+  if(cur===c.id&&c.msgs[c.msgs.length-1]===am&&!busy)paintSugg();
+ }catch{}
+}
+
+/* ---------- chat summary ---------- */
+async function openSummary(){
+ const c=chats.find(c=>c.id===cur);if(!c)return;
+ const head=`<h2>Chat summary ${X}</h2>`;
+ const tools=`<div class="row" style="margin-top:14px"><button class="btn" data-act="sumCopy">Copy</button><button class="btn" data-act="sumRegen">Regenerate</button></div>`;
+ if(c.sum&&c.sumN===c.msgs.length){modal(head+`<div class="bd" id="sumB">${md(c.sum)}</div>`+tools);return}
+ const sel=getSel();if(!sel){toast('Add an API key first');openSettings();return}
+ modal(head+`<div class="bd" id="sumB">${typ().replace(/Thinking(?: deeply)?…/,'Summarizing…')}</div>`);
+ try{
+  const tr=c.msgs.filter(m=>!m.err&&m.content).slice(-40).map(m=>`${m.role==='user'?'User':'Assistant'}: ${m.content.slice(0,1200)}`).join('\n\n');
+  const s=await llm(sel,"Summarize the conversation below for the user. Write in the same language and script the user uses (Bangla stays Bangla, Banglish stays Banglish). Format: one short overview sentence, then 'Key points' as 3-6 short bullets, then 'Next steps' bullets only if there are clear ones. Be concise, no preamble.",[{role:'user',content:tr}],{max:1200,temp:.3});
+  c.sum=s.trim();c.sumN=c.msgs.length;saveC();
+  const b=$('#sumB');if(b)b.innerHTML=md(c.sum)+tools;
+ }catch(e){const b=$('#sumB');if(b)b.innerHTML=`<span class="err">${esc(e.message==='Failed to fetch'?'Network error. Check your internet and API key.':e.message)}</span>`+tools}
+}
+
+/* ---------- App builder ---------- */
+const BSYS="You are an expert front-end developer. Produce ONE complete, self-contained HTML file (inline <style> and <script>; no external libraries, fonts, images or network requests). It must be responsive and work well on phones (large tap targets), look polished (modern clean design, smooth animations) and run inside a sandboxed iframe: wrap every localStorage/sessionStorage access in try/catch and fall back to in-memory values. Use the same language as the user's request for all visible text. Reply with ONLY the code in a single ```html block, with no explanation before or after.";
+let apps=load('mayra_apps',[]);
+const B={type:'app',id:null,name:'',html:'',prompt:'',tab:'prev',busy:false,mode:'new',ctrl:null,vers:[],vi:-1,live:'',lt:0};
+const IDEAS={web:['Portfolio website for a photographer','Restaurant landing page with menu','Business website with pricing table','Personal blog home page','School or coaching centre website'],app:['Todo list with categories','Unit converter','Pomodoro timer','Expense tracker','Quiz app'],game:['Snake game','Tic-tac-toe vs computer','Memory card match','Flappy-style bird','2048 puzzle']};
+function saveApps(){for(let i=0;i<80;i++){if(KV.set('mayra_apps',JSON.stringify(apps)))return;let tr=false;for(const x of apps.slice().reverse()){if(x.vers&&x.vers.length>2&&x.id!==B.id){x.vers.splice(0,x.vers.length-2);x.vi=x.vers.length-1;tr=true;break}}if(tr)continue;if(B.vers.length>3){B.vers.splice(0,B.vers.length-3);B.vi=B.vers.length-1;const x=apps.find(y=>y.id===B.id);if(x){x.vers=B.vers;x.vi=B.vi}continue}if(!apps.length)return;apps.pop()}}
+const bSlug=s=>(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'mayra-app';
+function bDoc(h){
+ if(!/<html[\s>]/i.test(h))return'<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>'+h+'</body></html>';
+ if(!/name=["']viewport/i.test(h))h=h.replace(/<head[^>]*>/i,m=>m+'<meta name="viewport" content="width=device-width,initial-scale=1">');
+ return h;
+}
+function bExtract(s){const m=s.match(/```(?:html|HTML)?[ \t]*\n?([\s\S]*?)(?:```|$)/);return(m?m[1]:s).replace(/^\s*\n/,'').trimEnd()}
+function openBuilder(){view='app';render();closeSide();if(innerWidth>800)$('#bP').focus()}
+function bPaint(){
+ const s=getSel();$('#bModel').textContent=s?s.m:'No model';
+ document.querySelectorAll('[data-bt]').forEach(b=>b.classList.toggle('on',b.dataset.bt===B.type));
+ document.querySelectorAll('[data-bv]').forEach(b=>b.classList.toggle('on',b.dataset.bv===B.tab));
+ $('#bIdeas').innerHTML=IDEAS[B.type].map(x=>`<button class="chip" data-idea="${ea(x)}">${esc(x)}</button>`).join('');
+ $('#bP').placeholder=B.type==='web'?'Describe your website… e.g. A modern portfolio site for a photographer with gallery and contact form':B.type==='game'?'Describe your game… e.g. Snake game with score, levels and touch controls':'Describe your app… e.g. A habit tracker with streaks and a clean design';
+ $('#bGo').innerHTML=B.busy&&B.mode==='new'?ic('stop')+' Stop':ic('code')+' Build';
+ $('#bEdit').innerHTML=B.busy&&B.mode==='edit'?ic('stop')+' Stop':ic('spark')+' Update';
+ $('#bEditBox').hidden=!B.html;
+ const has=!!B.html||B.busy;
+ $('#bEmpty').hidden=has;
+ $('#bFrame').hidden=!(B.tab==='prev'&&(B.busy?(B.live||(B.mode==='edit'&&B.html)):B.html));
+ $('#bCode').hidden=!(B.tab==='code'&&has);
+ $('#bBusy').hidden=!B.busy;
+ $('#bRun').hidden=B.tab!=='prev'&&B.tab!=='code'?true:!B.html;
+ $('#bCp').hidden=!B.html;$('#bPlay').hidden=!B.html;$('#bDl').hidden=!B.html;
+ ['bUndo','bRedo','bHist','bExp'].forEach(k=>$('#'+k).hidden=!B.html);$('#bUndo').disabled=!(B.vi>0);$('#bRedo').disabled=!(B.vi<B.vers.length-1);
+ $('#bQuick').innerHTML=BQUICK.map((x,i)=>`<button type="button" class="chip" data-cx="qedit:${i}">${esc(x)}</button>`).join('');
+ $('#bList').innerHTML=apps.length?apps.map(a=>`<div class="hi al ${a.id===B.id?'on':''}"><button class="t" data-bopen="${a.id}">${a.type==='game'?'🎮':a.type==='web'?'🌐':'📱'} ${esc(a.name)}</button><button class="d" data-bdel="${a.id}" title="Delete">${ic('trash')}</button></div>`).join(''):'<p class="vinfo" style="margin:4px 0">Your apps and games are saved here.</p>';
+}
+function bRunFrame(force){
+ if(!B.html)return;
+ if(B.tab!=='prev'){B.tab='prev';bPaint()}
+ const f=$('#bFrame');
+ if(force||f._h!==B.html){f.srcdoc=bDoc(B.html);f._h=B.html}
+}
+function bTab(t){
+ B.tab=t;
+ if(t==='code'&&!B.busy)$('#bCode').value=B.html;
+ bPaint();
+ if(t==='prev')bRunFrame();
+}
+function bPlay(){if(!B.html)return;bTab('prev');bRunFrame();$('#bld').classList.add('bfull')}
+function bDownload(){
+ if(!B.html)return;
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bDoc(B.html)],{type:'text/html'}));
+ a.download=bSlug(B.name)+'.html';document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Downloading '+a.download);
+}
+function bSaveCur(){
+ if(!B.html)return;
+ let a=apps.find(x=>x.id===B.id);
+ if(!a){B.id=Date.now().toString(36);a={id:B.id};apps.unshift(a)}
+ Object.assign(a,{name:B.name||'Untitled',type:B.type,html:B.html,prompt:B.prompt||'',ts:Date.now(),vers:B.vers,vi:B.vi});
+ saveApps();bPaint();
+}
+function bReset(){
+ if(B.busy&&B.ctrl)B.ctrl.abort();
+ B.id=null;B.name='';B.html='';B.prompt='';B.vers=[];B.vi=-1;B.live='';B.tab='prev';$('#bP').value='';$('#bE').value='';$('#bCode').value='';bPaint();
+}
+function bOpen(id){
+ const a=apps.find(x=>x.id===id);if(!a)return;
+ if(B.busy&&B.ctrl)B.ctrl.abort();
+ B.id=a.id;B.name=a.name;B.type=a.type||'app';B.html=a.html;B.prompt=a.prompt||'';B.vers=a.vers&&a.vers.length?a.vers:[{t:a.ts||Date.now(),n:'Saved',h:a.html}];B.vi=Math.min(Math.max(a.vi!=null?a.vi:B.vers.length-1,0),B.vers.length-1);B.live='';$('#bP').value=B.prompt;$('#bE').value='';
+ bTab('prev');
+}
+function bDel(id){
+ if(!confirm('Delete this project?'))return;
+ apps=apps.filter(x=>x.id!==id);saveApps();
+ if(B.id===id)bReset();else bPaint();
+}
+async function bBuild(edit){
+ if(B.busy){B.ctrl&&B.ctrl.abort();return}
+ const sel=getSel();if(!sel){toast('Add an API key first');openSettings();return}
+ const txt=(edit?$('#bE'):$('#bP')).value.trim();
+ if(!txt){toast('Write what you want to build');return}
+ if(edit&&!B.html)return;
+ const prev=edit?B.html:'';
+ if(!edit){B.id=null;B.name='';B.html='';B.prompt=txt;B.vers=[];B.vi=-1}
+ B.busy=true;B.mode=edit?'edit':'new';B.ctrl=new AbortController();B.tab='prev';B.live='';B.lt=0;
+ const cd=$('#bCode');cd.value='';bPaint();
+ if(innerWidth<=800)document.querySelector('.br').scrollIntoView({behavior:'smooth',block:'start'});
+ const kind=B.type==='web'?WEBKIND:B.type==='game'?'This is a GAME: include a score, a restart button, and both keyboard and touch controls.':'This is an APP: make it practical, polished and easy to use.';
+ const msgs=edit?[{role:'user',content:`Here is the current file:\n\`\`\`html\n${prev}\n\`\`\`\n\nApply this change (it may be written in Bangla, Banglish or English; keep ALL existing content, features and the page language unless the change says otherwise)${/sundor|সুন্দর|design|ডিজাইন|modern|beautiful|premium/i.test(txt)?'. Improve the visual design a lot: spacing, typography, colour harmony, shadows, rounded corners, hover effects, animations and responsive layout, without breaking any feature':''}: ${txt}\n\nReturn the COMPLETE updated file.`}]:[{role:'user',content:`Build this: ${txt}`}];
+ let acc='',raf=0;
+ const paint=()=>{raf=0;const h=bExtract(acc);cd.value=h;cd.scrollTop=cd.scrollHeight;bLive(h)};
+ try{
+  await llm(sel,BSYS+'\n'+kind,msgs,{signal:B.ctrl.signal,max:16000,temp:.6,onDelta:t=>{acc=t;if(!raf)raf=requestAnimationFrame(paint)}});
+  cancelAnimationFrame(raf);
+  const h=bExtract(acc);
+  if(!/<\w+/.test(h))throw new Error('No code came back. Try again or pick another model.');
+  B.html=h;
+  const tm=h.match(/<title>([^<]{1,60})<\/title>/i);
+  if(!edit||!B.name)B.name=(tm&&tm[1].trim())||txt.slice(0,30);
+  if(edit)$('#bE').value='';bPush(edit?txt.slice(0,60):'প্রথম version');
+  bSaveCur();
+ }catch(e){
+  cancelAnimationFrame(raf);
+  if(edit)B.html=prev;
+  if(e.name==='AbortError')toast('Stopped');
+  else toast(e.message==='Failed to fetch'?'Network error. Check your internet and API key.':e.message);
+ }
+ B.busy=false;B.ctrl=null;B.live='';
+ cd.value=B.html;B.tab='prev';bPaint();bRunFrame(true);
+}
+$('#bP').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();bBuild(false)}});
+$('#bE').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();bBuild(true)}});
+$('#bCode').addEventListener('input',()=>{B.html=$('#bCode').value;clearTimeout(bSaveCur.t);bSaveCur.t=setTimeout(bSaveCur,600);clearTimeout(bPush.t);bPush.t=setTimeout(()=>{const v=B.vers[B.vi];if(B.html&&(!v||v.h!==B.html)){bPush('✏️ Code edit');bSaveCur();bPaint()}},2500)});
+
+/* ---------- Image creation & photo editing (all inside chat) ---------- */
+let editMode=false;
+const EQ=[
+['Change background','Change the background to '],
+['Remove object','Remove the following from the photo and fill the area naturally: '],
+['Add object','Add the following to the photo: '],
+['Add a girl','Add a girl standing next to the person, natural pose, matching light and style.'],
+['Add a boy','Add a boy standing next to the person, natural pose, matching light and style.'],
+['Change color','Change the color of the '],
+['HD & Clear','Enhance this photo to HD quality: sharpen details, remove blur and noise, fix lighting and colors. Keep faces and the look natural.']];
+const EDIT_RE=/\b(edit|change|replace|remove|erase|add|background|hd|enhance|sharpen|blur|brighten|darken|colou?r|filter|crop|retouch|make (him|her|it|them|me|this|the))\b|rimuv|rimov|sorao|soraw|soriye|sorai|muche|mucho|fele\s*dao|felo|jog\s*kor|jukto|bosao|bosiye|lagao|hasi|hashi|smile|clear|porishkar|bodlao|bodle|poriborton|kete|kato|ber\s*kor|ekta\s*(meye|chele)|এডিট|বদল|পাল্ট|মুছ|সরা|যোগ|যুক্ত|ব্যাকগ্রাউন্ড|পটভূমি|পরিষ্কার|স্পষ্ট|রঙ|কালার|এইচডি|বসাও|বসিয়ে|হাসি|রিমুভ/i;
+const GEM_IMG=['gemini-3.1-flash-image','gemini-3.1-flash-image-preview','gemini-2.5-flash-image','gemini-3-pro-image-preview'];
+function prevImg(c){if(!c)return'';for(let i=c.msgs.length-1;i>=0;i--){const m=c.msgs[i];if(m.role==='assistant'&&m.gen&&m.gen.startsWith('data:'))return m.gen;if(m.role==='user'&&m.images&&m.images.length)return m.images[0]}return''}
+function dataBlob(u){const bin=atob(u.split(',')[1]),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:mime(u)})}
+async function imgHttpErr(r,name){
+ const t=await r.text();let m=t;
+ try{const j=JSON.parse(t);m=j.error&&j.error.message||j.error||j.message||(Array.isArray(j.errors)?j.errors.join('; '):'')||t;if(typeof m!=='string')m=JSON.stringify(m)}catch{}
+ const e=new Error(`${name} error ${r.status}: ${String(m).slice(0,300)}`);e.status=r.status;e.full=String(m);e.prov=name;return e;
+}
+function imgProvs(hasPics){
+ const k=S.keys;let o=(hasPics?['gemini','openai','stability']:['stability','openai','gemini','xai']).filter(p=>k[p]);
+ if(S.imgProv&&S.imgProv!=='auto'&&o.includes(S.imgProv))o=[S.imgProv,...o.filter(p=>p!==S.imgProv)];
+ return o;
+}
+async function gemImg(prompt,imgs,am){
+ const first=S.imgModels.gemini||GEM_IMG[0],list=[first,...GEM_IMG.filter(m=>m!==first)];
+ const parts=[{text:prompt},...imgs.map(u=>({inlineData:{mimeType:mime(u),data:b64(u)}}))];
+ let last=null;
+ for(const m of list){
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`,{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json','x-goog-api-key':S.keys.gemini},body:JSON.stringify({contents:[{parts}],generationConfig:{responseModalities:['TEXT','IMAGE']}})});
+  if(!r.ok){
+   const e=await imgHttpErr(r,'Google Gemini');last=e;
+   if(r.status===429&&/limit:\s*0/.test(e.full))break;          /* free key: every image model is blocked, don't retry */
+   if(/api key|API_KEY/i.test(e.full)||r.status===401||r.status===403)break;
+   continue;                                                   /* 404 / busy / other model: try the next image model */
+  }
+  const j=await r.json();let src='',note='';
+  for(const x of j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts||[]){const d=x.inlineData||x.inline_data;if(d)src=`data:${d.mimeType||d.mime_type};base64,${d.data}`;else if(x.text)note+=x.text}
+  if(src)return src;
+  if(j.promptFeedback&&j.promptFeedback.blockReason)note+=' ('+j.promptFeedback.blockReason+')';
+  last=new Error(note.trim()||'No image came back. Try a different instruction.');
+  if(note.trim())break;
+ }
+ throw last||new Error('No image came back.');
+}
+async function oaiImg(prompt,imgs,ip){
+ let r;const name=IMGP[ip];
+ if(imgs.length&&ip==='openai'){
+  const fd=new FormData();fd.append('model',S.imgModels.openai);fd.append('prompt',prompt);
+  imgs.forEach((u,i)=>fd.append('image[]',dataBlob(u),'img'+i+'.jpg'));fd.append('input_fidelity','high');
+  r=await fetch('https://api.openai.com/v1/images/edits',{method:'POST',signal:ctrl.signal,headers:{Authorization:'Bearer '+S.keys.openai},body:fd});if(r.status===400){fd.delete('input_fidelity');r=await fetch('https://api.openai.com/v1/images/edits',{method:'POST',signal:ctrl.signal,headers:{Authorization:'Bearer '+S.keys.openai},body:fd})}
+ }else{
+  const body={model:S.imgModels[ip],prompt,n:1};if(ip==='openai')body.size='1024x1024';
+  r=await fetch(P[ip].base+'/images/generations',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+S.keys[ip]},body:JSON.stringify(body)});
+ }
+ if(!r.ok)throw await imgHttpErr(r,name);
+ const j=await r.json(),d=j.data&&j.data[0];
+ const src=d&&d.b64_json?'data:image/png;base64,'+d.b64_json:(d&&d.url)||'';
+ if(!src)throw new Error('No image came back.');
+ return src;
+}
+function imgFail(errs){
+ const cr=errs.find(e=>e.status===402);
+ if(cr)return'Stability AI-তে credit শেষ। platform.stability.ai-তে credit কিনুন বা যোগ করুন, তারপর আবার চেষ্টা করুন।';
+ const au=errs.find(e=>e.prov==='Stability AI'&&(e.status===401||e.status===403)&&errs.length===1);
+ if(au)return'Stability AI key ঠিক নেই বা অনুমতি নেই। Settings-এ key আবার দিন।\n('+au.message.slice(0,160)+')';
+ const q=errs.find(e=>e.status===429||/quota|RESOURCE_EXHAUSTED/i.test(e.message));
+ if(q)return`ছবি তৈরি/এডিট করা যায়নি: ${q.prov||'API'} key-এর image quota শেষ বা নেই। Gemini-র free key-তে image model একদম চলে না (limit 0)।\nসমাধান: (১) Google AI Studio-তে billing চালু করুন, অথবা (২) Settings-এ OpenAI key যোগ করুন, অথবা (৩) quota reset হলে আবার চেষ্টা করুন।`;
+ return[...new Set(errs.map(e=>e.message))].join('\n');
+}
+
+/* ---------- Stability AI ---------- */
+const STAB='https://api.stability.ai';
+async function stabCall(path,fields,pics){
+ const fd=new FormData();
+ for(const[k,v]of Object.entries(fields))if(v!==undefined&&v!=='')fd.append(k,v);
+ for(const[k,u]of pics)fd.append(k,dataBlob(u),'image.jpg');
+ const r=await fetch(STAB+path,{method:'POST',signal:ctrl.signal,headers:{Authorization:'Bearer '+S.keys.stability,Accept:'image/*'},body:fd});
+ if(!r.ok)throw await imgHttpErr(r,'Stability AI');
+ const b=await r.blob();
+ return await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>rej(new Error('Could not read the image.'));fr.readAsDataURL(b)});
+}
+function fitPixels(u,maxPx){return new Promise(res=>{const im=new Image();im.onload=()=>{const k=Math.min(1,Math.sqrt(maxPx/(im.width*im.height)));if(k>=1)return res(u);const cv=document.createElement('canvas');cv.width=Math.floor(im.width*k);cv.height=Math.floor(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);res(cv.toDataURL('image/jpeg',.92))};im.onerror=()=>res(u);im.src=u})}
+async function stabPlan(txt){
+ const fb=()=>{let action='img2img';
+  if(/(remove|delete|erase)\s+(the\s+)?background|background\s+(remove|delete)|ব্যাকগ্রাউন্ড\s*(মুছ|সরা|রিমুভ|কেটে)/i.test(txt))action='remove_bg';
+  else if(/\b(hd|enhance|sharpen|upscale|clearer|unblur)\b|এইচডি|পরিষ্কার|স্পষ্ট/i.test(txt))action='upscale';
+  return{action,prompt:txt,strength:.4}};
+ const sel=getSel();if(!sel)return fb();
+ try{
+  const o=await llm(sel,'You turn a photo-edit request into a Stability AI plan. The user writes Bangla, Banglish (Bengali typed in English letters, e.g. "paser meyeke remove kore dao" = remove the girl beside her, "hasi add koro" = add a smile, "clear koro" = make HD) or English. Reply with ONLY JSON: {"action":"remove_bg|upscale|search_replace|img2img","prompt":"short English description of the desired result","search_prompt":"short English noun phrase of what to find (only for search_replace)","strength":0.3}. remove_bg = delete or cut out the background only. upscale = HD / sharper / clearer / better quality only. search_replace = remove, replace or recolor ONE specific person/object or the background (search_prompt = that thing with its position and colour if known, like \"girl on the right in yellow dress\"; prompt = what appears instead; to REMOVE something use prompt \"empty natural background matching the surroundings, nothing there\"). img2img = anything else; strength 0.25 for tiny face changes like adding a smile, 0.35 for light changes, 0.55 for adding people or objects. Faces must stay identical. No markdown.',[{role:'user',content:txt}],{max:300,temp:.2});
+  const j=JSON.parse(o.match(/\{[\s\S]*\}/)[0]);
+  if(!['remove_bg','upscale','search_replace','img2img'].includes(j.action))return fb();
+  if(j.action==='search_replace'&&!j.search_prompt)j.action='img2img';
+  j.prompt=String(j.prompt||txt);j.strength=Math.min(.7,Math.max(.15,+j.strength||.4));return j;
+ }catch(e){if(e&&e.name==='AbortError')throw e;return fb()}
+}
+async function stabImg(txt,imgs){
+ const plan=await stabPlan(txt);
+ if(!imgs.length)return stabCall('/v2beta/stable-image/generate/core',{prompt:plan.prompt,output_format:'png',aspect_ratio:'1:1'},[]);
+ const img=imgs[0];
+ if(plan.action==='remove_bg')return stabCall('/v2beta/stable-image/edit/remove-background',{output_format:'png'},[['image',img]]);
+ if(plan.action==='upscale')return stabCall('/v2beta/stable-image/upscale/conservative',{prompt:plan.prompt||'high quality sharp photo',output_format:'png'},[['image',await fitPixels(img,1000000)]]);
+ if(plan.action==='search_replace')return stabCall('/v2beta/stable-image/edit/search-and-replace',{prompt:plan.prompt,search_prompt:plan.search_prompt,output_format:'png'},[['image',img]]);
+ return stabCall('/v2beta/stable-image/generate/sd3',{prompt:plan.prompt+', exact same faces and identity, same people, same scene, photorealistic, high quality',mode:'image-to-image',strength:String(plan.strength||.4),model:S.imgModels.stability||'sd3.5-large',output_format:'png'},[['image',img]]);
+}
+function packImg(src){return new Promise(res=>{if(!src||!src.startsWith('data:'))return res(src);const im=new Image();im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);let o=cv.toDataURL('image/webp',.88);if(!o.startsWith('data:image/webp'))o=cv.toDataURL('image/jpeg',.88);res(o.length<src.length?o:src)};im.onerror=()=>res(src);im.src=src})}
+const imgExt=u=>((String(u).match(/^data:image\/(\w+)/)||[])[1]||'png').replace('jpeg','jpg');
+async function runImage(prompt,imgs,am,raw){
+ const order=imgProvs(imgs.length>0);
+ if(!order.length)throw new Error(imgs.length?'ছবি এডিট করতে Stability AI, Google Gemini বা OpenAI key লাগবে। Settings-এ key দিন।':'Image creation needs a Stability AI, OpenAI, Google Gemini or xAI key. Add one in Settings.');
+ const errs=[];
+ for(const ip of order){
+  try{
+   P_name=IMGP[ip];
+   const src=ip==='stability'?await stabImg(raw||prompt,imgs):ip==='gemini'?await gemImg(prompt,imgs,am):await oaiImg(prompt,imgs,ip);
+   if(src)return await packImg(src);
+  }catch(e){if(e.name==='AbortError')throw e;if(!e.prov)e.prov=IMGP[ip];if(e.message==='Failed to fetch')e.message=IMGP[ip]+': সংযোগ হয়নি (ইন্টারনেট, key বা ব্রাউজারের CORS বাধা)';errs.push(e)}
+ }
+ throw new Error(imgFail(errs));
+}
+async function editPhoto(txt,imgs,am){
+ const prompt=`You are a professional photo retoucher. The user may write Bangla, Banglish (Bengali typed in English letters) or English: understand the real intent. Image 1 is the photo to edit.${imgs.length>1?' Image 2 is an extra reference photo (a person, object, background or style to use if the request asks for it).':''}\nRequest: ${txt}\nSTRICT RULES: (1) Do ONLY what the request says. (2) Every person's face, skin tone, hair, eyes, identity, expression, body shape, clothes and pose must stay EXACTLY identical to the input unless the request names them; never redraw, beautify or age faces. (3) Keep the same background, camera angle, aspect ratio, orientation, colours and lighting everywhere not mentioned. (4) To REMOVE a person or object: erase it completely, rebuild the background naturally behind it, leave no ghost or blur, and do not move or change anyone who stays. (5) To ADD a smile: only gently adjust the mouth and cheeks, the face must still be clearly the same person. (6) To ADD a person or object: match light, shadows, scale and perspective. (7) For HD or clear: sharpen and denoise without changing faces. (8) Output only the final photo at the highest quality: no text, no watermark, no border.`;
+ am.gen=await runImage(prompt,imgs,am,txt);
+ if(!am.content)am.content='ছবিটা এডিট করে দিলাম। আরও কিছু বদলাতে চাইলে নিচে লিখুন।';
+}
+
+/* ================= v5 additions: copy-all, AI Companion, AI Team, Live Website Builder upgrades ================= */
+Object.assign(IC,{
+ undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>',
+ redo:'<path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/>',
+ hist:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/><path d="M16 4.5a3.5 3.5 0 010 7M18 14.5c2 .7 3.5 2.6 3.5 5.5"/>',
+ heart:'<path d="M12 20s-7-4.5-9-9a5 5 0 019-3 5 5 0 019 3c-2 4.5-9 9-9 9z"/>'
+});
+
+/* ---------- one-click copy ---------- */
+async function copyText(t){
+ t=String(t||'');
+ try{await navigator.clipboard.writeText(t)}
+ catch{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(a);a.focus();a.select();try{document.execCommand('copy')}catch{}a.remove()}
+ toast('Copied ✓');
+}
+function chatText(c){
+ const me=S.name||'You',cp=comp(),ai=cp?cp.name:'Mayra AI';
+ return c.msgs.filter(m=>!m.err&&(m.content||m.gen||(m.images&&m.images.length))).map(m=>`${m.role==='user'?me:ai}: ${m.content||(m.gen?'[image]':'[photo]')}`).join('\n\n');
+}
+function dlBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Downloading '+name)}
+
+/* ---------- AI Companion ---------- */
+const COMP_STYLES={
+ friend:{n:'বন্ধুর মতো',p:'Talk like a close, warm friend: casual, caring, a little playful, simple words, a few friendly emojis.'},
+ teacher:{n:'শিক্ষকের মতো',p:'Act like a patient, encouraging teacher: explain step by step with simple examples, check understanding, and add a tiny practice question when it helps.'},
+ pro:{n:'প্রফেশনাল',p:'Act like a professional assistant: precise, well structured, concise, polite, no slang, focused on getting things done.'},
+ custom:{n:'নিজের স্টাইল',p:''}
+};
+const AVATARS=['🤖','👧','👦','🧑‍🏫','👩‍💼','🦊','🐼','🌟','🧚','🦉','🔥','🎧'];
+function comp(){const c=S.comp;if(!c||c.on===false)return null;return Object.assign({name:'Mayra',avatar:'🤖',style:'friend',custom:'',img:''},c)}
+function compPrompt(voice){
+ const c=comp();if(!c)return'';
+ const st=COMP_STYLES[c.style]||COMP_STYLES.friend;
+ const how=c.style==='custom'?(c.custom||st.p):st.p+(c.custom?'\nExtra instructions from the user: '+c.custom:'');
+ return `Companion persona: your name is "${c.name}". ${how}\nStay in this persona in every reply and answer in the same language and script the user writes in (Bangla, Banglish or English).${voice?' This is a spoken conversation: no markdown and no emojis.':''}`;
+}
+const avInner=c=>c.img?`<img src="${esc(c.img)}" alt="">`:esc(c.avatar||'🤖');
+function compLogo(){const c=comp();return c?`<span class="cav">${avInner(c)}</span>`:logo(20)}
+let LOGOB0='',CP=null;
+function paintComp(){
+ const c=comp();
+ if(!LOGOB0)LOGOB0=$('#logoB').innerHTML;
+ $('#logoB').innerHTML=c?`<span class="cav xl">${avInner(c)}</span>`:LOGOB0;
+ const sub=document.querySelector('#home .s');if(sub)sub.textContent=c?`আমি ${c.name}। আজ কী নিয়ে কথা বলবে?`:'How can I help you today?';
+ $('#cComp').innerHTML=c?`<span class="cav sm">${avInner(c)}</span>${esc(c.name)}`:ic('heart')+'Companion';
+ $('#cComp').classList.toggle('on',!!c);
+ $('#cTeam').classList.toggle('on',teamMode);$('#nTeam').classList.toggle('on',teamMode);
+ const cc=chats.find(x=>x.id===cur);$('#tCopy').hidden=!(cc&&cc.msgs.length&&view==='chat');
+}
+function compPreview(c){
+ const g={friend:`হ্যালো! আমি ${c.name} 😊 কী খবর?`,teacher:`আমি ${c.name}। আজ কী শিখতে চাও?`,pro:`আমি ${c.name}। আপনাকে কীভাবে সাহায্য করতে পারি?`,custom:`আমি ${c.name}।`}[c.style]||'';
+ return `<span class="cav xl">${avInner(c)}</span><div><b>${esc(c.name||'Mayra')}</b><div class="vinfo" style="margin:2px 0 0">${esc(g)}</div></div>`;
+}
+function openComp(){CP=Object.assign({name:'Mayra',avatar:'🤖',style:'friend',custom:'',img:'',on:true},S.comp||{});compPaint()}
+function compPaint(){
+ modal(`<h2>AI Companion ${X}</h2><p style="color:var(--mut);font-size:13px">নিজের AI সঙ্গী বানাও: নাম, ছবি আর কথা বলার স্টাইল বেছে নাও।</p>
+ <div class="cprev" id="cPrev">${compPreview(CP)}</div>
+ <div class="row"><label>অবস্থা</label><select data-cp="on"><option value="1" ${CP.on!==false?'selected':''}>চালু</option><option value="0" ${CP.on===false?'selected':''}>বন্ধ (সাধারণ Mayra AI)</option></select></div>
+ <div class="row"><label>সঙ্গীর নাম</label><input data-cp="name" maxlength="24" value="${esc(CP.name||'')}" placeholder="যেমন: Mayra, Riya, Sir…"></div>
+ <div class="row"><label>Avatar</label><div class="avg">${AVATARS.map(a=>`<button type="button" class="avb ${!CP.img&&CP.avatar===a?'on':''}" data-cx="av:${a}">${a}</button>`).join('')}<button type="button" class="avb ${CP.img?'on':''}" data-cx="avup" title="নিজের ছবি">📷</button></div></div>
+ <div class="row"><label>কথা বলার স্টাইল</label><div class="seg" style="flex-wrap:wrap">${Object.entries(COMP_STYLES).map(([k,v])=>`<button type="button" class="${CP.style===k?'on':''}" data-cx="st:${k}">${v.n}</button>`).join('')}</div></div>
+ <div class="row"><label>${CP.style==='custom'?'তোমার স্টাইল লেখো':'নিজের নির্দেশ (ঐচ্ছিক)'}</label><textarea data-cp="custom" rows="3" placeholder="যেমন: আমাকে ভাই বলে ডাকবে, ছোট উত্তর দেবে, মাঝে মাঝে মজা করবে">${esc(CP.custom||'')}</textarea></div>
+ <div class="row"><button type="button" class="btn p bw" data-cx="compsave">Save</button></div>`);
+}
+function sqImg(f,px){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const m=Math.min(im.width,im.height),cv=document.createElement('canvas');cv.width=cv.height=px;cv.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,px,px);res(cv.toDataURL('image/jpeg',.82))};im.onerror=()=>res('');im.src=r.result};r.readAsDataURL(f)})}
+$('#mod').addEventListener('input',e=>{const t=e.target,k=t.dataset&&t.dataset.cp;if(!k||!CP)return;CP[k]=k==='on'?t.value==='1':t.value;const pv=$('#cPrev');if(pv)pv.innerHTML=compPreview(CP)});
+
+/* ---------- AI Team ---------- */
+let teamMode=false;
+const TEAM_COMMON='\nReply in the same language and script the user writes in (Bangla, Banglish or English). No preamble, no talk about other team members.';
+const TEAM=[
+ {k:'planner',e:'🧭',n:'Planner',sys:'You are the PLANNER of an AI team. Turn the user task into: 1) the goal in one line, 2) a short numbered plan, 3) key requirements and risks. Maximum 180 words. Do not write the final solution.'},
+ {k:'coder',e:'💻',n:'Coder',sys:'You are the CODER of an AI team. Follow the plan and produce the complete solution. If the task is a website, app or game, output ONE complete self-contained HTML file (inline CSS and JS, no external libraries or images, responsive, works on phones) inside a single ```html block. Otherwise write the full deliverable (code in fenced blocks, or finished text).'},
+ {k:'designer',e:'🎨',n:'Designer',sys:'You are the DESIGNER of an AI team. Improve the Coder result: layout, spacing, colour harmony, typography, mobile responsiveness, accessibility, clarity and polish. Start with 3-5 short bullets of what you changed, then give the COMPLETE improved result (the full file in one ```html block if it is HTML). Never drop existing features.'},
+ {k:'reviewer',e:'🔍',n:'Reviewer',sys:'You are the REVIEWER and tester of an AI team. Check the current result for bugs, broken logic, missing requirements, edge cases and security problems. Start with "Verdict: ✅ Pass" or "Verdict: ⚠️ Fixed", then 2-5 short bullets of issues found. Finish with the FINAL corrected COMPLETE result (full file in one ```html block if it is HTML).'}
+];
+function teamHTML(m){
+ return `<div class="team">${m.team.map(s=>`<details class="stg ${s.st}"${s.st==='run'?' open':''}><summary><span>${s.e}</span><b>${s.n}</b><i>${s.st==='run'?'কাজ করছে…':s.st==='done'?'✓ শেষ':s.st==='err'?'✗ সমস্যা':'অপেক্ষায়'}</i></summary><div class="sbx">${s.text?md(s.text):'<span class="vinfo">…</span>'}</div></details>`).join('')}</div>`;
+}
+function teamBtns(m,i){
+ if(!m.team||!m.team.every(s=>s.st==='done'))return'';
+ const html=/```html/i.test(m.content||'');
+ return `<div class="tbtn">${html?`<button type="button" class="btn p" data-cx="tobuild:${i}">${ic('code')} Live Builder-এ খোলো</button>`:''}<button type="button" class="btn" data-cx="teamcopy:${i}">${ic('copy')} সব step copy</button></div>`;
+}
+async function runTeam(task,c,am,sel){
+ am.team=TEAM.map(r=>({k:r.k,e:r.e,n:r.n,text:'',st:'wait'}));
+ const ctx=c.msgs.slice(0,-2).filter(m=>!m.err&&m.content).slice(-6).map(m=>`${m.role==='user'?'User':'Assistant'}: ${m.content.slice(0,600)}`).join('\n');
+ const out={};
+ const inp={
+  planner:()=>`Task from the user:\n${task}${ctx?`\n\nRecent conversation:\n${ctx}`:''}`,
+  coder:()=>`Task:\n${task}\n\nPlan from the Planner:\n${out.planner}`,
+  designer:()=>`Task:\n${task}\n\nPlan:\n${out.planner}\n\nCoder result:\n${out.coder}`,
+  reviewer:()=>`Task:\n${task}\n\nPlan:\n${out.planner}\n\nCurrent result (after the Designer):\n${out.designer}`
+ };
+ paintLast();
+ for(let i=0;i<TEAM.length;i++){
+  const r=TEAM[i],st=am.team[i];st.st='run';let raf=0;paintLast();
+  try{
+   const txt=await llm(sel,r.sys+TEAM_COMMON,[{role:'user',content:inp[r.k]()}],{signal:ctrl.signal,max:8000,temp:r.k==='planner'?.4:.5,onDelta:t=>{st.text=t;if(!raf)raf=requestAnimationFrame(()=>{raf=0;paintLast()})}});
+   cancelAnimationFrame(raf);
+   st.text=txt.trim();st.st='done';out[r.k]=st.text;
+  }catch(e){cancelAnimationFrame(raf);st.st='err';throw e}
+  paintLast();
+ }
+ am.content=out.reviewer;
+}
+
+/* ---------- Live Website Builder upgrades ---------- */
+const WEBKIND='This is a WEBSITE: build a complete multi-section responsive site (sticky navigation with smooth-scroll anchor links, hero with a clear call to action, features or services, about, gallery or portfolio made with CSS gradients, emoji and inline SVG instead of external images, testimonials, contact form UI, footer). Modern typography with system fonts, subtle animations, great on phones.';
+const BQUICK=['এই ডিজাইনটা আরও সুন্দর করো','Dark mode যোগ করো','মোবাইলের জন্য আরও ভালো করো','Animation যোগ করো','নতুন একটা section যোগ করো','রঙ আরও আধুনিক করো'];
+function bPush(note){
+ if(!B.html)return;
+ if(B.vi<B.vers.length-1)B.vers.splice(B.vi+1);
+ B.vers.push({t:Date.now(),n:note||'',h:B.html});
+ while(B.vers.length>15)B.vers.shift();
+ B.vi=B.vers.length-1;
+}
+function bApplyVer(){B.html=B.vers[B.vi].h;$('#bCode').value=B.html;bSaveCur();bTab('prev');bRunFrame(true);toast(`Version ${B.vi+1} / ${B.vers.length}`)}
+function bUndo(){if(B.busy)return;if(B.vi>0){B.vi--;bApplyVer()}else toast('আর আগের version নেই')}
+function bRedo(){if(B.busy)return;if(B.vi<B.vers.length-1){B.vi++;bApplyVer()}else toast('আর পরের version নেই')}
+function bLive(h){
+ if(!/<body[\s>]/i.test(h)||h.length<500)return;
+ B.live=h;
+ const now=Date.now();if(now-B.lt<1300)return;B.lt=now;
+ const f=$('#bFrame'),was=f.hidden;f.srcdoc=bDoc(h);f._h='live';if(was)bPaint();
+}
+function openHist(){
+ modal(`<h2>Version history ${X}</h2><p class="vinfo" style="margin:0 0 4px">${B.vers.length} টি version · এখন v${B.vi+1}</p>`+B.vers.map((v,i)=>({v,i})).reverse().map(({v,i})=>`<div class="ver ${i===B.vi?'on':''}"><div><b>v${i+1}</b> <small>${esc(new Date(v.t).toLocaleString())}</small><div class="vn">${esc(v.n||'')}</div></div><div style="display:flex"><button type="button" class="btn" data-cx="hver:${i}">${i===B.vi?'এখনকার':'Restore'}</button><button type="button" class="btn" data-cx="hcopy:${i}" title="Copy code">${ic('copy')}</button></div></div>`).join(''));
+}
+function crc32(u8){let c,crc=-1;if(!crc32.t){crc32.t=[];for(let n=0;n<256;n++){c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;crc32.t[n]=c>>>0}}for(let i=0;i<u8.length;i++)crc=crc32.t[(crc^u8[i])&255]^(crc>>>8);return(crc^-1)>>>0}
+function makeZip(files){
+ const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+ const d=new Date(),dt=(((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate())&0xffff,tm=((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1))&0xffff;
+ files.forEach(f=>{
+  const nm=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data);
+  const lh=new DataView(new ArrayBuffer(30));
+  lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(8,0,true);lh.setUint16(10,tm,true);lh.setUint16(12,dt,true);lh.setUint32(14,crc,true);lh.setUint32(18,data.length,true);lh.setUint32(22,data.length,true);lh.setUint16(26,nm.length,true);lh.setUint16(28,0,true);
+  parts.push(lh.buffer,nm,data);
+  const ch=new DataView(new ArrayBuffer(46));
+  ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(10,0,true);ch.setUint16(12,tm,true);ch.setUint16(14,dt,true);ch.setUint32(16,crc,true);ch.setUint32(20,data.length,true);ch.setUint32(24,data.length,true);ch.setUint16(28,nm.length,true);ch.setUint32(42,off,true);
+  cen.push(ch.buffer,nm);off+=30+nm.length+data.length;
+ });
+ const cl=cen.reduce((a,b)=>a+b.byteLength,0),e=new DataView(new ArrayBuffer(22));
+ e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cl,true);e.setUint32(16,off,true);
+ return new Blob([...parts,...cen,e.buffer],{type:'application/zip'});
+}
+function openExport(){
+ if(!B.html)return;
+ const o=[['html','⬇️','HTML ফাইল','একটাই ফাইল, যেকোনো জায়গায় খোলা যায়'],['zip','🗜️','ZIP (index.html + README)','hosting-এ আপলোডের জন্য'],['zipall','🕘','ZIP, সব version সহ','history-র সব version আলাদা ফাইলে'],['copy','📋','Code copy','এক ট্যাপে clipboard-এ'],['tab','🌐','নতুন ট্যাবে খোলো','পুরো পর্দায় দেখো'],['share','📤','Share','WhatsApp, Drive ইত্যাদিতে পাঠাও']];
+ modal(`<h2>Export ${X}</h2>${o.map(([k,i,t,d])=>`<button type="button" class="btn bw xo" data-cx="exp:${k}"><span>${i}</span><span><b>${t}</b><small>${d}</small></span></button>`).join('')}`);
+}
+function doExport(k){
+ const nm=bSlug(B.name),doc=bDoc(B.html),rd=`# ${B.name||'My site'}\n\nBuilt with Mayra AI Live Website Builder.\nOpen index.html in a browser, or upload the files to any static host (GitHub Pages, Netlify, Cloudflare Pages).\n`;
+ if(k==='html')dlBlob(new Blob([doc],{type:'text/html'}),nm+'.html');
+ else if(k==='zip')dlBlob(makeZip([{name:'index.html',data:doc},{name:'README.md',data:rd}]),nm+'.zip');
+ else if(k==='zipall')dlBlob(makeZip([{name:'index.html',data:doc},{name:'README.md',data:rd},...B.vers.map((v,i)=>({name:`versions/v${i+1}.html`,data:bDoc(v.h)}))]),nm+'-versions.zip');
+ else if(k==='copy')copyText(B.html);
+ else if(k==='tab'){const u=URL.createObjectURL(new Blob([doc],{type:'text/html'}));window.open(u,'_blank');setTimeout(()=>URL.revokeObjectURL(u),60000)}
+ else if(k==='share'){const f=new File([doc],nm+'.html',{type:'text/html'});if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:B.name||'Website'}).catch(()=>{});else toast('এই ব্রাউজারে share চলে না, Download ব্যবহার করো')}
+ if(k!=='copy')closeModal();
+}
+
+/* ---------- click handling for the new buttons ---------- */
+document.addEventListener('click',e=>{
+ const el=e.target.closest('[data-cx],#tCopy,#cTeam,#cComp,#nComp,#nTeam,#bUndo,#bRedo,#bHist,#bExp');
+ if(!el)return;
+ const id=el.id,cx=el.dataset.cx||'',ix=cx.indexOf(':'),a=ix<0?cx:cx.slice(0,ix),arg=ix<0?'':cx.slice(ix+1);
+ const cur_=chats.find(x=>x.id===cur);
+ if(id==='tCopy'){if(cur_)copyText(chatText(cur_));return}
+ if(id==='cTeam'||id==='nTeam'){teamMode=!teamMode;if(teamMode)imgMode=false;toast(teamMode?'AI Team চালু: Planner → Coder → Designer → Reviewer':'AI Team বন্ধ');render();if(id==='nTeam')closeSide();return}
+ if(id==='cComp'||id==='nComp'){openComp();if(id==='nComp')closeSide();return}
+ if(id==='bUndo'){bUndo();return}
+ if(id==='bRedo'){bRedo();return}
+ if(id==='bHist'){openHist();return}
+ if(id==='bExp'){openExport();return}
+ if(a==='av'){CP.avatar=arg;CP.img='';compPaint();return}
+ if(a==='avup'){const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(f.files[0]){const u=await sqImg(f.files[0],128);if(u){CP.img=u;compPaint()}}};f.click();return}
+ if(a==='st'){CP.style=arg;compPaint();return}
+ if(a==='compsave'){S.comp=Object.assign({},CP,{name:(CP.name||'').trim()||'Mayra'});saveS();closeModal();toast(S.comp.on===false?'Companion বন্ধ':`${S.comp.name} এখন তোমার সঙ্গী ✓`);return}
+ if(a==='teamcopy'){const m=cur_&&cur_.msgs[+arg];if(m&&m.team)copyText(m.team.map(s=>`## ${s.e} ${s.n}\n${s.text}`).join('\n\n'));return}
+ if(a==='tobuild'){
+  const m=cur_&&cur_.msgs[+arg];if(!m)return;
+  const mm=(m.content||'').match(/```html[ \t]*\n?([\s\S]*?)```/i);
+  if(!mm){toast('HTML code পাওয়া যায়নি');return}
+  B.type=B.type==='game'?'game':'web';B.id=null;B.html=mm[1].trim();B.vers=[];B.vi=-1;B.live='';
+  const tm=B.html.match(/<title>([^<]{1,60})<\/title>/i);B.name=(tm&&tm[1].trim())||'AI Team result';B.prompt=(cur_.msgs[+arg-1]&&cur_.msgs[+arg-1].content)||'';
+  $('#bP').value=B.prompt;$('#bE').value='';bPush('AI Team result');bSaveCur();openBuilder();bTab('prev');bRunFrame(true);return}
+ if(a==='hver'){B.vi=+arg;bApplyVer();closeModal();return}
+ if(a==='hcopy'){const v=B.vers[+arg];if(v)copyText(v.h);return}
+ if(a==='exp'){doExport(arg);return}
+ if(a==='qedit'){if(B.busy||!B.html)return;$('#bE').value=BQUICK[+arg];bBuild(true);return}
+ if(a==='vcopy'){const all=[...vLog];if(vCurU.trim())all.push({role:'user',text:vCurU});if(vCurA.trim())all.push({role:'model',text:vCurA});copyText(all.map(x=>`${x.role==='user'?(S.name||'You'):(comp()?comp().name:'Mayra AI')}: ${x.text}`).join('\n\n'));return}
+});
+
+/* ---------- PWA ---------- */
+let dip=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;if(!matchMedia('(display-mode:standalone)').matches)$('#nInstall').hidden=false});
+addEventListener('appinstalled',()=>{dip=null;$('#nInstall').hidden=true;toast('Installed')});
+async function pwaInstall(){
+ if(!dip){toast('Open your browser menu and tap “Add to Home screen”');return}
+ dip.prompt();try{await dip.userChoice}catch{}dip=null;$('#nInstall').hidden=true;
+}
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))(f=>document.readyState==='complete'?f():addEventListener('load',f))(()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})});
+
+/* ---------- boot ---------- */
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().catch(()=>{})}catch{}
+applyTheme();initUI();
+if(innerWidth<=800)$('#sb').classList.add('hide');
+render();
+if(!/^https?:$/.test(location.protocol))setTimeout(()=>toast('Opened from a file: the browser may forget your settings. Open it from a web address or use Backup settings.'),1200);
+</script>
+</body>
+</html>
